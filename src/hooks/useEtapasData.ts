@@ -20,21 +20,23 @@ export function useEtapasData(boardId: number | null) {
         let cursor: string | null = null;
 
         function fetchPage() {
-            const query = `query { boards(ids: ${boardId}) { items_page(${cursor ? `, cursor: "${cursor}"` : ""} limit: 500) { items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } cursor } } } }`;
+            const query = cursor
+                ? `query { boards(ids: ${boardId}) { next_items_page(cursor: "${cursor}") { items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } cursor } } } }`
+                : `query { boards(ids: ${boardId}) { items_page(limit: 500) { items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } cursor } } }`;
+
             monday.api(query).then(res => {
-                const page = res.data?.boards?.[0]?.items_page;
+                const page = cursor ? res.data?.boards?.[0]?.next_items_page : res.data?.boards?.[0]?.items_page;
                 if (!page) {
                     setIsLoading(false);
                     return;
                 }
-                console.log("Página de itens recebida:", page);
+
                 allItems = allItems.concat(page.items);
                 cursor = page.cursor || null;
 
                 if (cursor) {
                     fetchPage(); // continua paginando
                 } else {
-                    // Transformar os itens em etapas
                     const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
                     const etapasData: EtapaData[] = etapaTitles.map((title) => {
                         const total = allItems.filter(item => item.name.includes(title)).length;
@@ -49,6 +51,7 @@ export function useEtapasData(boardId: number | null) {
                 setIsLoading(false);
             });
         }
+
 
         fetchPage(); // inicia a primeira página
     }, [boardId]);
