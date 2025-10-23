@@ -11,64 +11,64 @@ const monday = mondaySdk();
 export function useEtapasData(boardId: number | null) {
     const [etapas, setEtapas] = useState<EtapaData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    console.log("entrou na função useEtapasDada com boardId:", boardId);
+
     useEffect(() => {
-        if (!boardId) return; // não faz nada se não houver boardId
+        if (!boardId) return;
 
-        async function fetchAllItems() {
-            setIsLoading(true);
-            let allItems: any[] = [];
-            let cursor: string | null = null;
+        setIsLoading(true);
+        let allItems: any[] = [];
+        let cursor: string | null = null;
 
-            try {
-                do {
-                    const query: string = `query {
-                        boards(ids: ${boardId}) {
-                            items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
-                                items {
-                                    id
-                                    name
-                                    column_values {
-                                        id
-                                        text
-                                        ... on MirrorValue { id display_value }
-                                        ... on FormulaValue { id value display_value }
-                                        ... on BoardRelationValue { linked_item_ids display_value }
-                                    }
-                                }
-                            cursor
+        function fetchPage() {
+            const query = `query {
+                boards(ids: ${boardId}) {
+                    items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
+                        items {
+                            id
+                            name
+                            column_values {
+                                id
+                                text
+                                ... on MirrorValue { id display_value }
+                                ... on FormulaValue { id value display_value }
+                                ... on BoardRelationValue { linked_item_ids display_value }
                             }
                         }
-                    }`;
-                    console.log("query a ser enviada:", query)
-                    const res = await monday.api(query);
-                    console.log("Resposta da API:", res);
-                    const page = res.data?.boards?.[0]?.items_page;
-                    console.log("Página retornada:", page);
-                    if (!page) break;
+                    cursor
+                    }
+                }
+            }`;
 
-                    allItems = allItems.concat(page.items);
-                    cursor = page.cursor || null;
-                } while (cursor);
+            monday.api(query).then(res => {
+                const page = res.data?.boards?.[0]?.items_page;
+                if (!page) {
+                    setIsLoading(false);
+                    return;
+                }
 
-                // Transformar os itens em etapas
-                // Por enquanto mantemos mock por título, mas total vem do allItems
-                const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
-                const etapasData: EtapaData[] = etapaTitles.map((title) => {
-                    // aqui você pode filtrar `allItems` por alguma coluna para contar
-                    const total = allItems.filter(item => item.name.includes(title)).length;
-                    return { title, total };
-                });
+                allItems = allItems.concat(page.items);
+                cursor = page.cursor || null;
 
-                setEtapas(etapasData);
-            } catch (error) {
-                console.error("Erro ao buscar itens do Monday:", error);
-            } finally {
+                if (cursor) {
+                    fetchPage(); // continua paginando
+                } else {
+                    // Transformar os itens em etapas
+                    const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
+                    const etapasData: EtapaData[] = etapaTitles.map((title) => {
+                        const total = allItems.filter(item => item.name.includes(title)).length;
+                        return { title, total };
+                    });
+
+                    setEtapas(etapasData);
+                    setIsLoading(false);
+                }
+            }).catch(err => {
+                console.error("Erro ao buscar itens do Monday:", err);
                 setIsLoading(false);
-            }
+            });
         }
 
-        fetchAllItems();
+        fetchPage(); // inicia a primeira página
     }, [boardId]);
 
     return { etapas, isLoading };
