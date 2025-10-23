@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { useEtapasData } from './hooks/useEtapasData';
 import CardEtapa from './components/CardEtapa';
 import './App.css'
 import mondaySdk from "monday-sdk-js";
@@ -13,6 +14,7 @@ interface MondayContext {
 function App() {
   const [boardId, setBoardId] = useState<number | null>(null);
   const [theme, setTheme] = useState<string>("light");
+  const { etapas, isLoading } = useEtapasData();
   // useEffect será usado aqui pra levantar os dados. Talvez dê pra usar um arquivo separado para ter menos linhas aqui.
   useEffect(() => {
     async function fetchContext() {
@@ -41,20 +43,30 @@ function App() {
 
     fetchContext();
   }, []);
+
+
   const [totalProspects, setTotalProspects] = useState(0)
   return (
     <>
       <div className="flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
         <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
+
         <div className="flex flex-col gap-10 w-4/5 justify-center border-2">
           <h2 className="font-bold ml-4 mt-2">Visão Geral</h2>
-          <div className="flex gap-20 justify-center">
-            <CardEtapa title="Prospects" total={totalProspects} />
-            <CardEtapa title="Oportunidades" total={totalProspects} />
-            <CardEtapa title="Forecasts" total={totalProspects} />
-            <CardEtapa title="Contratos Firmados" total={totalProspects} />
-            <CardEtapa title="Stand-by" total={totalProspects} />
-          </div>
+
+          {isLoading ? (
+            <p className="text-center text-gray-500">Carregando dados...</p>
+          ) : (
+            <div className="flex gap-20 justify-center flex-wrap">
+              {etapas.map((etapa) => (
+                <CardEtapa
+                  key={etapa.title}
+                  title={etapa.title}
+                  total={etapa.total}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>
