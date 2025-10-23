@@ -11,7 +11,7 @@ const monday = mondaySdk();
 export function useEtapasData(boardId: number | null) {
     const [etapas, setEtapas] = useState<EtapaData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
+    console.log("entrou na função useEtapasDada com boardId:", boardId);
     useEffect(() => {
         if (!boardId) return; // não faz nada se não houver boardId
 
@@ -40,7 +40,7 @@ export function useEtapasData(boardId: number | null) {
                             }
                         }
                     }`;
-
+                    console.log("query a ser enviada:", query)
                     const res = await monday.api(query);
                     console.log("Resposta da API:", res);
                     const page = res.data?.boards?.[0]?.items_page;
