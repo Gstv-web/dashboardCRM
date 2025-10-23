@@ -12,7 +12,7 @@ interface MondayContext {
 
 function App() {
   const [boardId, setBoardId] = useState<number | null>(null);
-  const [theme, setTheme] = useState<string>("light")
+  const [theme, setTheme] = useState<string>("light");
   // useEffect será usado aqui pra levantar os dados. Talvez dê pra usar um arquivo separado para ter menos linhas aqui.
   useEffect(() => {
     async function fetchContext() {
