@@ -11,8 +11,8 @@ interface MondayContext {
 }
 
 function App() {
-  const [_boardId, _setBoardId] = useState<number | null>(null);
-  const [_theme, _setTheme] = useState<string>("light");
+  const [boardId, setBoardId] = useState<number | null>(null);
+  const [theme, setTheme] = useState<string>("light");
   // useEffect será usado aqui pra levantar os dados. Talvez dê pra usar um arquivo separado para ter menos linhas aqui.
   useEffect(() => {
     async function fetchContext() {
@@ -23,25 +23,25 @@ function App() {
 
         // Board ID: usa o do contexto, senão fallback manual
         const id = context.boardId || 9434159176;
-        _setBoardId(id);
+        setBoardId(id);
         console.log("Board ID definido:", id);
 
         // Tema: usa o do contexto se existir, senão 'light'
         const currentTheme = context.theme || "light";
-        _setTheme(currentTheme);
+        setTheme(currentTheme);
         console.log(`Tema definido: ${currentTheme}`);
 
       } catch (err) {
         console.error("Erro ao obter contexto do Monday:", err);
         // fallback seguro mesmo em caso de erro
-        _setBoardId(9434159176);
-        _setTheme("light");
+        setBoardId(9434159176);
+        setTheme("light");
       }
     }
 
     fetchContext();
   }, []);
-  const [totalProspects, _setTotalProspects] = useState(0)
+  const [totalProspects, setTotalProspects] = useState(0)
   return (
     <>
       <div className="flex flex-col items-center border-2 w-full h-full overflow-auto">
