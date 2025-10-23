@@ -22,7 +22,7 @@ function App() {
         console.log("Contexto retornado:", context);
 
         // Board ID: usa o do contexto, senão fallback manual
-        const id = context.boardId || 9434159176;
+        const id = context.boardId || 3591217049;
         setBoardId(id);
         console.log("Board ID definido:", id);
 
@@ -34,7 +34,7 @@ function App() {
       } catch (err) {
         console.error("Erro ao obter contexto do Monday:", err);
         // fallback seguro mesmo em caso de erro
-        setBoardId(9434159176);
+        setBoardId(3591217049);
         setTheme("light");
       }
     }
