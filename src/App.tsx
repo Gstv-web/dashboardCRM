@@ -1,51 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useEtapasData } from './hooks/useEtapasData';
+import { useMondayContext } from './hooks/useMondayContext';
 import CardEtapa from './components/CardEtapa';
 import './App.css'
-import mondaySdk from "monday-sdk-js";
-
-const monday = mondaySdk();
-interface MondayContext {
-  boardId?: number,
-  theme?: string,
-  [key: string]: any // permite eu escolher outras propriedades dinamicamente
-}
 
 function App() {
-  const [boardId, setBoardId] = useState<number | null>(null);
-  const [theme, setTheme] = useState<string>("light");
-  const { etapas, isLoading } = useEtapasData();
-  // useEffect será usado aqui pra levantar os dados. Talvez dê pra usar um arquivo separado para ter menos linhas aqui.
-  useEffect(() => {
-    async function fetchContext() {
-      try {
-        const res = await monday.get("context");
-        const context: MondayContext = res?.data || {}; // garante que é um objeto, mesmo se undefined
-        console.log("Contexto retornado:", context);
-
-        // Board ID: usa o do contexto, senão fallback manual
-        const id = context.boardId || 3591217049;
-        setBoardId(id);
-        console.log("Board ID definido:", id);
-
-        // Tema: usa o do contexto se existir, senão 'light'
-        const currentTheme = context.theme || "light";
-        setTheme(currentTheme);
-        console.log(`Tema definido: ${currentTheme}`);
-
-      } catch (err) {
-        console.error("Erro ao obter contexto do Monday:", err);
-        // fallback seguro mesmo em caso de erro
-        setBoardId(3591217049);
-        setTheme("light");
-      }
-    }
-
-    fetchContext();
-  }, []);
-
-
-  const [totalProspects, setTotalProspects] = useState(0)
+  const { boardId, theme, isLoading: isContextLoading } = useMondayContext();
+  const { etapas, isLoading: isEtapasLoading } = useEtapasData(boardId);
+  const isLoading = isContextLoading || isEtapasLoading;
+  
   return (
     <>
       <div className="flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
