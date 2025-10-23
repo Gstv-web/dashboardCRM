@@ -3,5 +3,29 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    // Ajustes específicos para Monday SDK
+    "verbatimModuleSyntax": false,
+    "erasableSyntaxOnly": false,
+
+    // Para evitar erros de variáveis não usadas temporariamente
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  }
 }
