@@ -23,26 +23,27 @@ export function useEtapasData(boardId: number | null) {
             try {
                 do {
                     const query: string = `query {
-            boards(ids: ${boardId}) {
-              items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
-                items {
-                  id
-                  name
-                  column_values {
-                    id
-                    text
-                    ... on MirrorValue { id display_value }
-                    ... on FormulaValue { id value display_value }
-                    ... on BoardRelationValue { linked_item_ids display_value }
-                  }
-                }
-                cursor
-              }
-            }
-          }`;
+                        boards(ids: ${boardId}) {
+                            items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
+                                items {
+                                    id
+                                    name
+                                    column_values {
+                                        id
+                                        text
+                                        ... on MirrorValue { id display_value }
+                                        ... on FormulaValue { id value display_value }
+                                        ... on BoardRelationValue { linked_item_ids display_value }
+                                    }
+                                }
+                            cursor
+                            }
+                        }
+                    }`;
 
                     const res = await monday.api(query);
                     const page = res.data?.boards?.[0]?.items_page;
+                    console.log("Página retornada:", page)
                     if (!page) break;
 
                     allItems = allItems.concat(page.items);
