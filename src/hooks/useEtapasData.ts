@@ -20,7 +20,7 @@ export function useEtapasData(boardId: number | null) {
         let cursor: string | null = null;
 
         function fetchPage() {
-            const query = `query { boards(ids: ${boardId}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ""}) { items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } cursor } } } }`;
+            const query = `query { boards(ids: ${boardId}) { items_page(${cursor ? `, cursor: "${cursor}"` : ""} limit: 500) { items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } cursor } } } }`;
             monday.api(query).then(res => {
                 const page = res.data?.boards?.[0]?.items_page;
                 if (!page) {
