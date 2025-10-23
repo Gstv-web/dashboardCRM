@@ -22,7 +22,7 @@ export function useEtapasData(boardId: number | null) {
         function fetchPage() {
             const query = `query {
                 boards(ids: ${boardId}) {
-                    items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
+                    items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ""}) {
                         items {
                             id
                             name
