@@ -42,8 +42,9 @@ export function useEtapasData(boardId: number | null) {
                     }`;
 
                     const res = await monday.api(query);
+                    console.log("Resposta da API:", res);
                     const page = res.data?.boards?.[0]?.items_page;
-                    console.log("Página retornada:", page)
+                    console.log("Página retornada:", page);
                     if (!page) break;
 
                     allItems = allItems.concat(page.items);

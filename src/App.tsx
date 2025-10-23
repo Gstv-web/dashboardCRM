@@ -8,6 +8,7 @@ function App() {
   const { boardId, theme, isLoading: isContextLoading } = useMondayContext();
   const { etapas, isLoading: isEtapasLoading } = useEtapasData(boardId);
   const isLoading = isContextLoading || isEtapasLoading;
+  console.log("Etapas carregadas:", etapas);
   
   return (
     <>
