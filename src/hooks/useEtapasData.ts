@@ -5,39 +5,69 @@ interface EtapaData {
     title: string;
     total: number;
 }
-const monday = mondaySdk();
-interface MondayContext {
-    boardId?: number,
-    theme?: string,
-    [key: string]: any // permite eu escolher outras propriedades dinamicamente
-}
 
-export function useEtapasData(id: number| null) {
+const monday = mondaySdk();
+
+export function useEtapasData(boardId: number | null) {
     const [etapas, setEtapas] = useState<EtapaData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-
     useEffect(() => {
-        async function fetchMockedData() {
+        if (!boardId) return; // não faz nada se não houver boardId
+
+        async function fetchAllItems() {
             setIsLoading(true);
+            let allItems: any[] = [];
+            let cursor: string | null = null;
 
-            // simulação de requisição (pode virar API ou Monday API depois)
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            try {
+                do {
+                    const query: string = `query {
+            boards(ids: ${boardId}) {
+              items_page(limit: 500${cursor ? `, after: "${cursor}"` : ""}) {
+                items {
+                  id
+                  name
+                  column_values {
+                    id
+                    text
+                    ... on MirrorValue { id display_value }
+                    ... on FormulaValue { id value display_value }
+                    ... on BoardRelationValue { linked_item_ids display_value }
+                  }
+                }
+                cursor
+              }
+            }
+          }`;
 
-            const mockData: EtapaData[] = [
-                { title: "Prospects", total: 24 },
-                { title: "Oportunidades", total: 15 },
-                { title: "Forecasts", total: 10 },
-                { title: "Contratos Firmados", total: 8 },
-                { title: "Stand-by", total: 5 },
-            ];
+                    const res = await monday.api(query);
+                    const page = res.data?.boards?.[0]?.items_page;
+                    if (!page) break;
 
-            setEtapas(mockData);
-            setIsLoading(false);
+                    allItems = allItems.concat(page.items);
+                    cursor = page.cursor || null;
+                } while (cursor);
+
+                // Transformar os itens em etapas
+                // Por enquanto mantemos mock por título, mas total vem do allItems
+                const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
+                const etapasData: EtapaData[] = etapaTitles.map((title) => {
+                    // aqui você pode filtrar `allItems` por alguma coluna para contar
+                    const total = allItems.filter(item => item.name.includes(title)).length;
+                    return { title, total };
+                });
+
+                setEtapas(etapasData);
+            } catch (error) {
+                console.error("Erro ao buscar itens do Monday:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
 
-        fetchMockedData();
-    }, []);
+        fetchAllItems();
+    }, [boardId]);
 
     return { etapas, isLoading };
 }
