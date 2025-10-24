@@ -37,6 +37,7 @@ export function useEtapasData(boardId: number | null) {
                 if (cursor) {
                     fetchPage(); // continua paginando
                 } else {
+                    console.log("Todos os itens carregados:", allItems)
                     const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
                     const etapasData: EtapaData[] = etapaTitles.map((title) => {
                         const total = allItems.filter(item => item.name.includes(title)).length;
