@@ -21,7 +21,7 @@ export function useEtapasData(boardId: number | null) {
     // função recursiva de paginação
     function fetchPage(cursor?: string) {
       const query = cursor
-        ? `query { next_items_page(cursor: "${cursor}") { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
+        ? `query { next_items_page(cursor: "${cursor}", limit: 80) { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
         : `query { boards(ids: ${boardId}) { items_page(limit: 80) { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
         console.log("Executando query:", query);
       monday
