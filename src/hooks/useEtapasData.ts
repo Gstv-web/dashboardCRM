@@ -45,7 +45,8 @@ export function useEtapasData(boardId: number | null) {
 
           if (page.cursor) {
             console.log("indo pra próxima página com cursor:", page.cursor);
-            fetchPage(page.cursor); // continua paginando
+            // fetchPage(page.cursor); // continua paginando
+            setTimeout(() => fetchPage(cursor), 1000);
           } else {
             console.log("Paginação finalizada. Total de itens:", allItems.length);
 
