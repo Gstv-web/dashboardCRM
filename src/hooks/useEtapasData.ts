@@ -1,63 +1,81 @@
 import { useState, useEffect } from "react";
 import mondaySdk from "monday-sdk-js";
 
-interface EtapaData {
-    title: string;
-    total: number;
-}
-
 const monday = mondaySdk();
 
+interface EtapaData {
+  title: string;
+  total: number;
+}
+
 export function useEtapasData(boardId: number | null) {
-    const [etapas, setEtapas] = useState<EtapaData[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [etapas, setEtapas] = useState<EtapaData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        if (!boardId) return;
+  useEffect(() => {
+    if (!boardId) return;
 
-        setIsLoading(true);
-        let allItems: any[] = [];
-        let cursor: string | null = null;
+    setIsLoading(true);
+    let allItems: any[] = [];
 
-        function fetchPage() {
-            const query = cursor
-                ? `query { next_items_page(cursor: "${cursor}") { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
-                : `query { boards(ids: ${boardId}) { items_page(limit: 70) { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
-            console.log("Executando query:", query);
-            monday.api(query).then(res => {
-                const page = cursor ? res.data?.next_items_page : res.data?.boards?.[0]?.items_page;
-                console.log("resposta:", res)
-                console.log("page:", page)
-                if (!page) {
-                    setIsLoading(false);
-                    return;
-                }
-                allItems = allItems.concat(page.items);
-                cursor = page.cursor || null;
-                console.log("cursor atual:", cursor)
+    // função recursiva de paginação
+    function fetchPage(cursor: string | null = null) {
+      const query = cursor
+        ? `query { next_items_page(cursor: "${cursor}") { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
+        : `query { boards(ids: ${boardId}) { items_page(limit: 500) { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
 
-                if (cursor) {
-                    fetchPage(); // continua paginando
-                } else {
-                    console.log("Todos os itens carregados:", allItems)
-                    const etapaTitles = ["Prospects", "Oportunidades", "Forecasts", "Contratos Firmados", "Stand-by"];
-                    const etapasData: EtapaData[] = etapaTitles.map((title) => {
-                        const total = allItems.filter(item => item.name.includes(title)).length;
-                        return { title, total };
-                    });
+      monday
+        .api(query)
+        .then((res: any) => {
+          let page;
+          if (cursor) {
+            page = res?.data?.next_items_page;
+          } else {
+            page = res?.data?.boards?.[0]?.items_page;
+          }
+          console.log("Página recebida:", page);
+          if (!page) {
+            console.warn("Nenhuma página retornada.");
+            setIsLoading(false);
+            return;
+          }
 
-                    setEtapas(etapasData);
-                    setIsLoading(false);
-                }
-            }).catch(err => {
-                console.error("Erro ao buscar itens do Monday:", err);
-                setIsLoading(false);
+          allItems = allItems.concat(page.items);
+          console.log("Itens acumulados:", allItems.length);
+
+          if (page.cursor) {
+            fetchPage(page.cursor); // continua paginando
+          } else {
+            console.log("Paginação finalizada. Total de itens:", allItems.length);
+
+            // Exemplo de transformação em etapas
+            const etapaTitles = [
+              "Prospects",
+              "Oportunidades",
+              "Forecasts",
+              "Contratos Firmados",
+              "Stand-by",
+            ];
+
+            const etapasData: EtapaData[] = etapaTitles.map((title) => {
+              const total = allItems.filter((item) =>
+                item.name.includes(title)
+              ).length;
+              return { title, total };
             });
-        }
 
+            setEtapas(etapasData);
+            setIsLoading(false);
+          }
+        })
+        .catch((err: any) => {
+          console.error("Erro ao buscar itens do Monday:", err);
+          setIsLoading(false);
+        });
+    }
 
-        fetchPage(); // inicia a primeira página
-    }, [boardId]);
+    fetchPage(); // primeira chamada
+  }, [boardId]);
 
-    return { etapas, isLoading };
+  return { etapas, isLoading };
 }
