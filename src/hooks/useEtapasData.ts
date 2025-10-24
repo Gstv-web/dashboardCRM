@@ -48,7 +48,7 @@ export function useEtapasData(boardId: number | null) {
             // fetchPage(page.cursor); // continua paginando
             setTimeout(() => fetchPage(page.cursor), 2000);
           } else {
-            console.log("Paginação finalizada. Total de itens:", allItems.length);
+            console.log("Paginação finalizada. ITEMS:", allItems);
 
             // Exemplo de transformação em etapas
             const etapaTitles = [
