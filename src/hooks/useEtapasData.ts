@@ -23,7 +23,7 @@ export function useEtapasData(boardId: number | null) {
       const query = cursor
         ? `query { next_items_page(cursor: "${cursor}") { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
         : `query { boards(ids: ${boardId}) { items_page(limit: 80) { cursor items { id name column_values { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
-
+        console.log("Executando query:", query);
       monday
         .api(query)
         .then((res: any) => {
@@ -44,6 +44,7 @@ export function useEtapasData(boardId: number | null) {
           console.log("Itens acumulados:", allItems.length);
 
           if (page.cursor) {
+            console.log("indo pra próxima página com cursor:", page.cursor);
             fetchPage(page.cursor); // continua paginando
           } else {
             console.log("Paginação finalizada. Total de itens:", allItems.length);
