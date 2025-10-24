@@ -26,12 +26,12 @@ export function useEtapasData(boardId: number | null) {
             console.log("Executando query:", query);
             monday.api(query).then(res => {
                 const page = cursor ? res.data?.boards?.[0]?.next_items_page : res.data?.boards?.[0]?.items_page;
+                console.log("resposta:", res)
                 console.log("page:", page)
                 if (!page) {
                     setIsLoading(false);
                     return;
                 }
-                console.log("resposta:", res)
                 allItems = allItems.concat(page.items);
                 cursor = page.cursor || null;
 
