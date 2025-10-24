@@ -34,6 +34,7 @@ export function useEtapasData(boardId: number | null) {
                 }
                 allItems = allItems.concat(page.items);
                 cursor = page.cursor || null;
+                console.log("cursor atual:", cursor)
 
                 if (cursor) {
                     fetchPage(); // continua paginando
