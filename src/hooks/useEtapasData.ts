@@ -31,6 +31,7 @@ export function useEtapasData(boardId: number | null) {
                     return;
                 }
                 console.log("resposta::", res)
+                console.log("page:", page)
                 allItems = allItems.concat(page.items);
                 cursor = page.cursor || null;
 
