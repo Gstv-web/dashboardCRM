@@ -30,7 +30,7 @@ export function useEtapasData(boardId: number | null) {
                     setIsLoading(false);
                     return;
                 }
-
+                console.log("resposta::", res)
                 allItems = allItems.concat(page.items);
                 cursor = page.cursor || null;
 
