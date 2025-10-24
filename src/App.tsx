@@ -12,7 +12,7 @@ function App() {
   
   return (
     <>
-      <div className="flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
+      <div className="flex flex-col items-center border-2 w-full h-full overflow-auto bg-white m-4">
         <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
 
         <div className="flex flex-col gap-10 w-4/5 justify-center border-2">
