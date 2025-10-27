@@ -78,6 +78,7 @@ export function useEtapasData(boardId: number | null) {
 
             setEtapas(etapasData);
             setIsLoading(false);
+            console.log("printar etapas", etapas);
           }
         })
         .catch((err: any) => {
