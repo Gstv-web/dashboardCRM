@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useEtapasData } from './hooks/useEtapasData';
 import { useMondayContext } from './hooks/useMondayContext';
+import { useMondayData } from './hooks/useMondayData';
 import CardEtapa from './components/CardEtapa';
 import './App.css'
 
 function App() {
   const { boardId, theme, isLoading: isContextLoading } = useMondayContext();
-  const { etapas, isLoading: isEtapasLoading } = useEtapasData(boardId);
-  const isLoading = isContextLoading || isEtapasLoading;
+  const { items, isLoading} = useMondayData(boardId);
+  const etapas = useEtapasData(items)
   console.log("Etapas carregadas:", etapas);
   
   return (
