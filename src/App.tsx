@@ -12,7 +12,7 @@ function App() {
   const etapas = useEtapasData(items)
   // console.log("Etapas carregadas:", etapas);
 
-  const vendedoresUnicos = Array.from(new Set(items.map((i) => i.column_values.find((c: {id: string, text:string}) => c.id === "dropdown_mksy1g2t")?.text).filter(Boolean)))
+  const vendedoresUnicos = Array.from(new Set(items.map((i) => i.column_values.find((c: {id: string, text:string}) => c.id === "dropdown_mksy1g2t")?.text).filter(Boolean))).sort((a, b) => a.localeCompare(b));
   
   return (
     <>
