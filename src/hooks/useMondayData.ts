@@ -3,7 +3,7 @@ import mondaySdk from "monday-sdk-js";
 
 const monday = mondaySdk();
 
-
+// BUSCAR ITEMS DO QUADRO PARA SEREM USADOS EM OUTROS ARQUIVOS PARA FILTRO
 export function useMondayData(boardId: number | null) {
   const [items, setItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,7 +43,7 @@ export function useMondayData(boardId: number | null) {
             // fetchPage(page.cursor); // continua paginando
             setTimeout(() => fetchPage(page.cursor), 2000);
           } else {
-            // console.log("Paginação finalizada. ITEMS:", allItems);
+            console.log("Paginação finalizada. ITEMS:", allItems);
 
             setItems(allItems);
             setIsLoading(false);
