@@ -3,18 +3,13 @@ import mondaySdk from "monday-sdk-js";
 
 const monday = mondaySdk();
 
-interface EtapaData {
-  title: string;
-  total: number;
-}
 
-export function useEtapasData(boardId: number | null) {
-  const [etapas, setEtapas] = useState<EtapaData[]>([]);
+export function useMondayData(boardId: number | null) {
+  const [items, setItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!boardId) return;
-
     setIsLoading(true);
     let allItems: any[] = [];
 
@@ -49,28 +44,10 @@ export function useEtapasData(boardId: number | null) {
             setTimeout(() => fetchPage(page.cursor), 2000);
           } else {
             // console.log("Paginação finalizada. ITEMS:", allItems);
-            
-            const etapaTitles = [
-              "Prospect - 25%",
-              "Oportunidade - 50%",
-              "Forecast - 75%",
-              "Contrato Firmado - 100%",
-              "Ação Pontual Firmada - 100%",
-              "Operação Pró-Bono",
-              "Stand-by",
-              "Encerrado/Negado"
-            ];
 
-            const etapasData: EtapaData[] = etapaTitles.map((title) => {
-              const total = allItems.filter((item) =>
-                item.column_values.find((col: {id: string }) => col.id === "status6__1").text.includes(title)
-              ).length;
-              return { title, total };
-            });
-
-            setEtapas(etapasData);
+            setItems(allItems);
             setIsLoading(false);
-            console.log("printar etapas", etapas);
+            console.log("printar etapas", items);
           }
         })
         .catch((err: any) => {
@@ -82,7 +59,7 @@ export function useEtapasData(boardId: number | null) {
     fetchPage(); // primeira chamada
   }, [boardId]);
 
-  return { etapas, isLoading };
+  return { items, isLoading };
 }
 
 
