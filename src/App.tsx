@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useEtapasData } from './hooks/useEtapasData';
 import { useMondayContext } from './hooks/useMondayContext';
 import { useMondayData } from './hooks/useMondayData';
+import { useEvolucaoData } from './hooks/useEvolucaoData';
 import CardEtapa from './components/CardEtapa';
 import './App.css';
 
@@ -17,6 +18,8 @@ function App() {
 
   // 🔹 Etapas (passando o vendedor selecionado)
   const etapas = useEtapasData(items, vendedor);
+  const dadosGrafico = useEvolucaoData(items);
+  console.log("Dados para o gráfico:", dadosGrafico);
 
   return (
     <div className="main flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
