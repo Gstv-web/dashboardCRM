@@ -44,8 +44,8 @@ function App() {
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
 
       <div className="dashboard flex flex-col gap-10 w-4/5 justify-center border-2 m-4 bg-blue-300">
-        <div className="dashboard-visao-geral flex flex-col justify-between items-center p-4 border-2 bg-green-300">
-          <div className="filto flex">
+        <div className="dashboard-visao-geral flex flex-col  p-4 border-2 bg-green-300">
+          <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
             <select
               className="border p-2 rounded bg-white"
