@@ -44,7 +44,7 @@ function App() {
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
 
       <div className="outter flex flex-col gap-10 w-4/5 justify-center border-2 m-4 bg-blue-300">
-        <div className="inner flex justify-between items-center p-4 border-2">
+        <div className="inner flex justify-between items-center p-4 border-2 bg-green-300">
           <h2 className="font-bold">Visão Geral</h2>
           <select
             className="border p-2 rounded bg-white"
