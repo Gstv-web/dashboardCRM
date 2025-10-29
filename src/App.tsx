@@ -32,7 +32,7 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {etapas.map((etapa) => (
+              {(vendedor ? vendedoresUnicos : etapas).map((etapa) => (
                 <CardEtapa
                   key={etapa.title}
                   title={etapa.title}
