@@ -13,6 +13,11 @@ export function useMondayData(boardId: number | null) {
     setIsLoading(true);
     let allItems: any[] = [];
 
+    // função auxiliar para obter o texto de uma coluna
+    function getText(item: any, colId: string): string | null {
+      return item.column_values.find((c: { id: string }) => c.id === colId)?.text || null;
+    }
+
     // função recursiva de paginação
     function fetchPage(cursor?: string) {
       const query = cursor
@@ -35,7 +40,28 @@ export function useMondayData(boardId: number | null) {
             return;
           }
 
-          allItems = allItems.concat(page.items);
+          // 🔹 [TRECHO ADICIONADO AQUI] Normalização dos dados brutos:
+          const normalized = page.items.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            etapa: getText(item, "status6__1"),
+            vendedor: getText(item, "dropdown_mksy1g2t"),
+            cliente: getText(item, "pessoas1__1"),
+            valor_ativacao: getText(item, "n_meros5"),
+            valor_manutencao: getText(item, "formula_mkrcbxzb"),
+            datas: {
+              prospect: getText(item, "data7__1"),
+              oportunidade: getText(item, "date2"),
+              forecast: getText(item, "date"),
+              encerrado: getText(item, "data_mkm88e9q"),
+              contrato: getText(item, "date_mkqz73j2"),
+              standby: getText(item, "date_mksxtcqj"),
+            },
+          }));
+
+          allItems = allItems.concat(normalized);
+
+          // allItems = allItems.concat(page.items);
           console.log("Itens acumulados:", allItems.length);
 
           if (page.cursor) {

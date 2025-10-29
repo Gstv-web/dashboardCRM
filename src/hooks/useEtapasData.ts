@@ -8,14 +8,19 @@ interface EtapaData {
 interface Item {
   id: string;
   name: string;
-  column_values: { id: string, text: string }[];
+  etapa: string;
+  vendedor?: string;
 }
 
 export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
   return useMemo(() => {
     if (!items.length) return [];
 
-    const itemsPorVendedor = vendedorSelecionado ? items.filter((item) => item.column_values.some((col) => col.id === "dropdown_mksy1g2t" && col.text === vendedorSelecionado)) : items;
+    // const itemsPorVendedor = vendedorSelecionado ? items.filter((item) => item.column_values.some((col) => col.id === "dropdown_mksy1g2t" && col.text === vendedorSelecionado)) : items;
+   
+    const itemsFiltrados = vendedorSelecionado
+      ? items.filter((item) => item.vendedor === vendedorSelecionado)
+      : items;
 
     const etapaTitles = [
       "Prospect - 25%",
@@ -29,9 +34,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
     ];
 
     return etapaTitles.map((title) => {
-      const total = items.filter((item) =>
-        item.column_values.find((col: { id: string }) => col.id === "status6__1")?.text.includes(title)
-      ).length;
+      const total = itemsFiltrados.filter((item) => item.etapa === title).length;
       return { title, total };
     });
   }, [items, vendedorSelecionado]);
