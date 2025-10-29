@@ -10,10 +10,11 @@ function App() {
   const { items, isLoading} = useMondayData(boardId);
   const [vendedor, setVendedor] = useState<string | undefined>();
   const etapas = useEtapasData(items)
+  
   // console.log("Etapas carregadas:", etapas);
 
   const vendedoresUnicos = Array.from(new Set(items.map((i) => i.column_values.find((c: {id: string, text:string}) => c.id === "dropdown_mksy1g2t")?.text).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-  
+  const etapasPorVendedor = useEtapasData(vendedoresUnicos);
   return (
     <>
       <div className="flex flex-col items-center border-2 w-full h-full overflow-auto bg-white m-4">
