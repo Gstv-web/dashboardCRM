@@ -45,21 +45,23 @@ function App() {
 
       <div className="dashboard flex flex-col gap-10 w-4/5 justify-center border-2 m-4 bg-blue-300">
         <div className="dashboard-visao-geral flex flex-col justify-between items-center p-4 border-2 bg-green-300">
-          <h2 className="font-bold">Visão Geral</h2>
-          <select
-            className="border p-2 rounded bg-white"
-            value={vendedor || ''}
-            onChange={(e) =>
-              setVendedor(e.target.value || undefined)
-            }
-          >
-            <option value="">Todos os vendedores</option>
-            {vendedoresUnicos.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+          <div className="filto flex">
+            <h2 className="font-bold">Visão Geral</h2>
+            <select
+              className="border p-2 rounded bg-white"
+              value={vendedor || ''}
+              onChange={(e) =>
+                setVendedor(e.target.value || undefined)
+              }
+            >
+              <option value="">Todos os vendedores</option>
+              {vendedoresUnicos.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {isLoading ? (
             <p className="text-center text-gray-500">Carregando dados...</p>
