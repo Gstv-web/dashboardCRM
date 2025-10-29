@@ -70,7 +70,7 @@ function App() {
             </div>
           )}
         </div>
-
+        <div className="dashboard-grafico">Aqui vai o gráfico</div>
       </div>
     </div>
   );
