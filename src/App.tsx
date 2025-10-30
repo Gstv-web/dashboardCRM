@@ -21,13 +21,12 @@ function App() {
   const etapas = useEtapasData(items, vendedor);
 
   // 🔹 Evolução (filtrada também)
-  const dadosGrafico = useMemo(() => {
+  const itensFiltrados = useMemo(() => {
     if (!items) return [];
-    const filtrados = vendedor
-      ? items.filter((i) => i.vendedor === vendedor)
-      : items;
-    return useEvolucaoData(filtrados);
-  }, [items, vendedor, useEvolucaoData]);
+    return vendedor ? items.filter((i) => i.vendedor === vendedor) : items;
+  }, [items, vendedor]);
+
+  const dadosGrafico = useEvolucaoData(itensFiltrados);
 
   return (
     <div className="main flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
