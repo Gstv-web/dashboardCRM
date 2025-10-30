@@ -3,13 +3,19 @@ import { useMemo } from "react";
 interface Item {
   id: string;
   name: string;
-  etapa: string; // etapa atual
-  prospectDate?: string | Date | null;
-  oportunidadeDate?: string | Date | null;
-  forecastDate?: string | Date | null;
-  contratoDate?: string | Date | null;
-  encerradoDate?: string | Date | null;
-  standbyDate?: string | Date | null;
+  etapa: string;
+  vendedor?: string;
+  cliente?: string;
+  valor_ativacao?: string;
+  valor_manutencao?: string;
+  datas: {
+    prospect?: string | Date | null;
+    oportunidade?: string | Date | null;
+    forecast?: string | Date | null;
+    contrato?: string | Date | null;
+    encerrado?: string | Date | null;
+    standby?: string | Date | null;
+  };
 }
 
 interface EvolucaoEtapa {
@@ -25,7 +31,7 @@ function dentroDosUltimosDias(date: Date | null, dias: number): boolean {
   if (!date) return false;
   const agora = new Date();
   const limite = new Date();
-  limite.setDate(agora.getDate() - dias); // ❗️use setDate, não setUTCDate
+  limite.setDate(agora.getDate() - dias);
   return date >= limite && date <= agora;
 }
 
@@ -34,7 +40,7 @@ function parseDate(valor: string | Date | null | undefined): Date | null {
   if (!valor) return null;
   if (valor instanceof Date) return valor;
 
-  // Normaliza formato YYYY-MM-DD (caso venha do Monday)
+  // Normaliza formato YYYY-MM-DD (como vem do Monday)
   const partes = valor.split("-");
   if (partes.length === 3) {
     const [ano, mes, dia] = partes.map(Number);
@@ -45,18 +51,18 @@ function parseDate(valor: string | Date | null | undefined): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-/** 🔹 Hook para calcular evolução real das etapas (considerando etapa atual) */
+/** 🔹 Hook para calcular evolução real das etapas (usando `datas`) */
 export function useEvolucaoData(items: Item[]) {
   return useMemo(() => {
     if (!items?.length) return [];
 
-    const etapasMap: Record<string, keyof Item> = {
-      "Prospect - 25%": "prospectDate",
-      "Oportunidade - 50%": "oportunidadeDate",
-      "Forecast - 75%": "forecastDate",
-      "Contrato Firmado - 100%": "contratoDate",
-      "Encerrado/Negado": "encerradoDate",
-      "Stand-by": "standbyDate",
+    const etapasMap: Record<string, keyof Item["datas"]> = {
+      "Prospect - 25%": "prospect",
+      "Oportunidade - 50%": "oportunidade",
+      "Forecast - 75%": "forecast",
+      "Contrato Firmado - 100%": "contrato",
+      "Encerrado/Negado": "encerrado",
+      "Stand-by": "standby",
     };
 
     const resultados: EvolucaoEtapa[] = [];
@@ -64,12 +70,8 @@ export function useEvolucaoData(items: Item[]) {
     for (const [etapa, campoData] of Object.entries(etapasMap)) {
       const contar = (dias: number) => {
         return items.filter((i) => {
-          const data = parseDate(i[campoData]);
-          // 🔸 antes, só contava se `i.etapa === etapa`
-          //     mas o item pode ter mudado recentemente, então
-          //     a contagem deve considerar *a data da mudança*,
-          //     não a etapa atual
-          return data && dentroDosUltimosDias(data, dias);
+          const data = parseDate(i.datas?.[campoData]);
+          return i.etapa === etapa && dentroDosUltimosDias(data, dias);
         }).length;
       };
 
