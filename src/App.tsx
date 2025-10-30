@@ -4,8 +4,9 @@ import { useMondayContext } from './hooks/useMondayContext';
 import { useMondayData } from './hooks/useMondayData';
 import { useEvolucaoData } from './hooks/useEvolucaoData';
 import CardEtapa from './components/CardEtapa';
+import GraficoEvolucao from './components/GraficoEvolucao';
 import './App.css';
-import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
+
 
 function App() {
   const { boardId } = useMondayContext();
@@ -60,17 +61,7 @@ function App() {
             Aqui vai o filtro do dashboard
           </div>
           <div className="dashboard-grafico border-2">
-            <LineChart
-              data={dadosGrafico}
-              responsive
-            >
-              <CartesianGrid strokeDasharray="3 3"/>
-              <XAxis dataKey="etapa"/>
-              <YAxis width="auto"/>
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="dias7" />
-            </LineChart>
+            <GraficoEvolucao dados={dadosGrafico}/>
           </div>
         </div>
       </div>
