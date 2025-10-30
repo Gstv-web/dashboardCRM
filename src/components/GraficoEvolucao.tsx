@@ -59,11 +59,11 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
   // 🔹 Cores automáticas para linhas
   const cores = [
     "#2563eb", // azul
-    "#16a34a", // verde
     "#f59e0b", // amarelo
+    "#17d45cff", // verde
+    "#1a6d0fff", // roxo
     "#dc2626", // vermelho
-    "#9333ea", // roxo
-    "#0ea5e9", // ciano
+    "#f08d0cff", // ciano
     "#64748b", // cinza
   ];
 
