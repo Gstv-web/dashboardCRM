@@ -24,7 +24,7 @@ export interface EvolucaoEtapa {
 }
 
 /** Config */
-const DEBUG = true; // liga logs se precisar diagnosticar
+const DEBUG = false; // liga logs se precisar diagnosticar
 
 /** Parsea YYYY-MM-DD ou Date para um Date UTC no midnight (truncado) */
 function parseToUTCDateMidnight(valor: string | Date | null | undefined): Date | null {
