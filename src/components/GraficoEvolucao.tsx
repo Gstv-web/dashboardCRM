@@ -32,10 +32,10 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
   // 🔹 Transformar formato [{ etapa, dias7, dias14... }]
   // em formato [{ periodo: "7 dias", Prospect: 4, Oportunidade: 3, ... }]
   const dadosTransformados = [
-    { periodo: "7 dias" },
-    { periodo: "14 dias" },
-    { periodo: "21 dias" },
-    { periodo: "30 dias" },
+      { periodo: "30 dias" },
+      { periodo: "21 dias" },
+      { periodo: "14 dias" },
+      { periodo: "7 dias" },
   ].map((linha) => {
     const periodo = linha.periodo;
     const resultado: any = { periodo };
