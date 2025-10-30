@@ -5,6 +5,7 @@ import { useMondayData } from './hooks/useMondayData';
 import { useEvolucaoData } from './hooks/useEvolucaoData';
 import CardEtapa from './components/CardEtapa';
 import './App.css';
+import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 function App() {
   const { boardId } = useMondayContext();
@@ -19,7 +20,7 @@ function App() {
   // 🔹 Etapas (passando o vendedor selecionado)
   const etapas = useEtapasData(items, vendedor);
   const dadosGrafico = useEvolucaoData(items);
-  console.log("Dados para o gráfico:", dadosGrafico);
+  // console.log("Dados para o gráfico:", dadosGrafico);
 
   return (
     <div className="main flex flex-col items-center border-2 w-full h-full overflow-auto bg-white">
@@ -59,7 +60,17 @@ function App() {
             Aqui vai o filtro do dashboard
           </div>
           <div className="dashboard-grafico border-2">
-            Aqui vai o gráfico
+            <LineChart
+              data={dadosGrafico}
+              responsive
+            >
+              <CartesianGrid strokeDasharray="3 3"/>
+              <XAxis dataKey="etapa"/>
+              <YAxis width="auto"/>
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="dias7" />
+            </LineChart>
           </div>
         </div>
       </div>
