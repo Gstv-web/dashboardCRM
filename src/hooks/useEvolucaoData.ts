@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-/** 🔹 Representa um item vindo do Monday normalizado */
+/** Tipos exportados */
 export interface Item {
   id: string;
   name: string;
@@ -15,7 +15,6 @@ export interface Item {
   >;
 }
 
-/** 🔹 Estrutura de saída — contagens por etapa e faixa de dias */
 export interface EvolucaoEtapa {
   etapa: string;
   dias7: number;
@@ -24,37 +23,48 @@ export interface EvolucaoEtapa {
   dias30: number;
 }
 
-/** 🔹 Representa uma faixa de tempo em dias (não acumulativa) */
-interface Range {
-  nome: keyof Omit<EvolucaoEtapa, "etapa">;
-  diasInicio: number;
-  diasFim: number;
-}
+/** Config */
+const DEBUG = false; // liga logs se precisar diagnosticar
 
-/** 🔹 Converte string (ex: "2025-10-29") ou Date em Date válida */
-function parseDate(valor: string | Date | null | undefined): Date | null {
+/** Parsea YYYY-MM-DD ou Date para um Date UTC no midnight (truncado) */
+function parseToUTCDateMidnight(valor: string | Date | null | undefined): Date | null {
   if (!valor) return null;
-  if (valor instanceof Date) return valor;
-
-  const partes: string[] = valor.split("-");
-  if (partes.length === 3) {
-    const [ano, mes, dia] = partes.map(Number);
-    const parsed = new Date(ano, mes - 1, dia);
-    return isNaN(parsed.getTime()) ? null : parsed;
+  if (valor instanceof Date) {
+    // cria cópia truncada para midnight UTC
+    return new Date(Date.UTC(valor.getUTCFullYear(), valor.getUTCMonth(), valor.getUTCDate()));
   }
-
-  const parsed = new Date(valor);
-  return isNaN(parsed.getTime()) ? null : parsed;
+  const s = String(valor).trim();
+  // tenta formato YYYY-MM-DD (mais comum do Monday)
+  const partes = s.split("-");
+  if (partes.length === 3) {
+    const [anoStr, mesStr, diaStr] = partes;
+    const ano = Number(anoStr);
+    const mes = Number(mesStr);
+    const dia = Number(diaStr);
+    if (!Number.isNaN(ano) && !Number.isNaN(mes) && !Number.isNaN(dia)) {
+      return new Date(Date.UTC(ano, mes - 1, dia)); // midnight UTC
+    }
+  }
+  // fallback: tenta criar Date e normalizar para UTC midnight
+  const maybe = new Date(s);
+  if (isNaN(maybe.getTime())) return null;
+  return new Date(Date.UTC(maybe.getUTCFullYear(), maybe.getUTCMonth(), maybe.getUTCDate()));
 }
 
-/** 🔹 Hook para calcular a evolução das etapas (não acumulativa) */
+/** calcula diferença em dias inteiros (hojeUTCMidnight - dateUTCmidnight) */
+function diffDaysFromTodayUTC(dateUtcMidnight: Date): number {
+  const now = new Date();
+  const todayUtcMid = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const target = Date.UTC(dateUtcMidnight.getUTCFullYear(), dateUtcMidnight.getUTCMonth(), dateUtcMidnight.getUTCDate());
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.floor((todayUtcMid - target) / msPerDay);
+}
+
+/** hook principal */
 export function useEvolucaoData(items: Item[]): EvolucaoEtapa[] {
   return useMemo<EvolucaoEtapa[]>(() => {
-    if (!Array.isArray(items) || items.length === 0) {
-      return [];
-    }
+    if (!Array.isArray(items) || items.length === 0) return [];
 
-    /** Mapeia a etapa textual para o campo correspondente em `datas` */
     const etapasMap: Record<string, keyof Item["datas"]> = {
       "Prospect - 25%": "prospect",
       "Oportunidade - 50%": "oportunidade",
@@ -64,52 +74,72 @@ export function useEvolucaoData(items: Item[]): EvolucaoEtapa[] {
       "Stand-by": "standby",
     };
 
-    /** Define faixas de dias (não acumulativas) */
-    const ranges: Range[] = [
-      { nome: "dias7", diasInicio: 0, diasFim: 7 },
-      { nome: "dias14", diasInicio: 8, diasFim: 14 },
-      { nome: "dias21", diasInicio: 15, diasFim: 21 },
-      { nome: "dias30", diasInicio: 22, diasFim: 30 },
+    // faixas EXCLUSIVAS: 0-7, 8-14, 15-21, 22-30 (ambos inclusivos)
+    const ranges = [
+      { key: "dias7" as const, start: 0, end: 7 },
+      { key: "dias14" as const, start: 8, end: 14 },
+      { key: "dias21" as const, start: 15, end: 21 },
+      { key: "dias30" as const, start: 22, end: 30 },
     ];
 
-    const hoje: Date = new Date();
     const resultados: EvolucaoEtapa[] = [];
 
-    /** Itera cada etapa e calcula suas contagens */
+    // pré-process debug: converte todas as datas para UTC-truncated (cache)
+    const cacheDates = new Map<string, Partial<Record<keyof Item["datas"], Date | null>>>();
+    for (const it of items) {
+      const parsed: Partial<Record<keyof Item["datas"], Date | null>> = {};
+      for (const key of Object.values(etapasMap) as (keyof Item["datas"])[]) {
+        parsed[key] = parseToUTCDateMidnight(it.datas?.[key]);
+      }
+      cacheDates.set(it.id, parsed);
+    }
+
+    if (DEBUG) {
+      console.log("DEBUG cacheDates sample:", Array.from(cacheDates.entries()).slice(0, 5));
+      console.log("DEBUG total items:", items.length);
+    }
+
     for (const [etapa, campoData] of Object.entries(etapasMap)) {
-      // Inicializa contadores fortemente tipados
-      const contagens: Record<keyof Omit<EvolucaoEtapa, "etapa">, number> = {
-        dias7: 0,
-        dias14: 0,
-        dias21: 0,
-        dias30: 0,
-      };
+      // contadores tipados
+      const contagens = { dias7: 0, dias14: 0, dias21: 0, dias30: 0 };
 
-      items.forEach((item: Item): void => {
-        const dataEtapa: Date | null = parseDate(item.datas?.[campoData]);
-        if (!dataEtapa) return;
+      for (const it of items) {
+        // regra: só conta para a etapa se a etapa atual do item for exatamente igual (string compare)
+        if (!it.etapa || it.etapa.trim() !== etapa) continue;
 
-        // Somente conta se o item estiver atualmente nesta etapa
-        if (item.etapa !== etapa) return;
+        const parsedDates = cacheDates.get(it.id);
+        const data = parsedDates ? parsedDates[campoData] ?? null : parseToUTCDateMidnight(it.datas?.[campoData]);
 
-        const diffDias: number = (hoje.getTime() - dataEtapa.getTime()) / (1000 * 60 * 60 * 24);
+        if (!data) {
+          if (DEBUG) console.log(`DEBUG no date for item ${it.id} stage ${etapa}`);
+          continue;
+        }
 
-        // Atribui o item à faixa correta (não acumulativa)
-        for (const { nome, diasInicio, diasFim } of ranges) {
-          if (diffDias >= diasInicio && diffDias <= diasFim) {
-            contagens[nome] += 1;
-            break;
+        const diff = diffDaysFromTodayUTC(data); // inteiro >= 0
+        if (DEBUG) {
+          // mostra quando a data cai dentro 0..30 para inspeção
+          if (diff <= 30) console.log(`DEBUG item ${it.id} etapa ${etapa} diffDays=${diff}`);
+        }
+
+        // encontra faixa exclusiva
+        for (const r of ranges) {
+          if (diff >= r.start && diff <= r.end) {
+            (contagens as any)[r.key] += 1;
+            break; // garante um item entra em 1 faixa no máximo
           }
         }
-      });
+      }
 
       resultados.push({
         etapa,
-        ...contagens,
+        dias7: contagens.dias7,
+        dias14: contagens.dias14,
+        dias21: contagens.dias21,
+        dias30: contagens.dias30,
       });
     }
 
-    console.log("📊 Evolução (faixas exclusivas, tipado):", resultados);
+    if (DEBUG) console.log("📊 Evolução (não acumulada):", resultados);
     return resultados;
   }, [items]);
 }
