@@ -65,7 +65,7 @@ function App() {
         {/* 🔹 GRÁFICO DE EVOLUÇÃO */}
         <div className="dashboard-grafico-area">
           <div className="dashboard-filtro flex justify-between items-center p-4">
-            <h2 className="font-bold">Evolução por Etapa</h2>
+            <h2 className="font-bold">Evolução por período</h2>
             <select
               className="border p-2 rounded bg-white"
               value={vendedor || ''}
