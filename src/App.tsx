@@ -35,7 +35,7 @@ function App() {
 
       <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center border-2 border-yellow-600 m-4">
         {/* 🔹 VISÃO GERAL */}
-        <div className="dashboard-visao-geral flex flex-col p-4 border-2 bg-green-300">
+        <div className="dashboard-visao-geral flex flex-col p-4 border-2 rounded-2xl bg-white">
           <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
             <select
