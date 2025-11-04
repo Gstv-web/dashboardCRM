@@ -64,7 +64,7 @@ function App() {
         </div>
 
         {/* 🔹 GRÁFICO DE EVOLUÇÃO */}
-        <div className="dashboard-grafico-area border-b border-opacity-25 border-gray-300">
+        <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300">
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
             <select
