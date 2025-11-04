@@ -9,7 +9,7 @@ interface CardProps {
 
 const CardEtapa: React.FC<CardProps> = ({ title, total, titleColor = "font-bold"}) => {
     return (
-        <div className={`flex-col self-auto p-4 rounded-2xl ring border-2 w-40 text-center bg-white`}>
+        <div className={`flex-col self-auto p-4 rounded-2xl ring border-2 w-40 text-center bg-white justify-around`}>
             <h2 className={`${titleColor}`}>{title}</h2>
             <p className="justify-self-center">{total}</p>
         </div>
