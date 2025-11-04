@@ -10,21 +10,22 @@ import './App.css';
 function App() {
   const { boardId } = useMondayContext();
   const { items, isLoading } = useMondayData(boardId);
-  const [vendedor, setVendedor] = useState<string | undefined>();
+  const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string | undefined>();
+  const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
 
   // 🔹 Vendedores únicos (ordenados)
   const vendedoresUnicos = Array.from(
     new Set(items.map((i) => i.vendedor).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
-  // 🔹 Etapas (filtradas pelo vendedor selecionado)
-  const etapas = useEtapasData(items, vendedor);
+  // 🔹 Visão geral
+  const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
-  // 🔹 Evolução (filtrada também)
+  // 🔹 Gráfico
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
-    return vendedor ? items.filter((i) => i.vendedor === vendedor) : items;
-  }, [items, vendedor]);
+    return vendedorGrafico ? items.filter((i) => i.vendedor === vendedorGrafico) : items;
+  }, [items, vendedorGrafico]);
 
   const dadosGrafico = useEvolucaoData(itensFiltrados);
 
@@ -39,8 +40,8 @@ function App() {
             <h2 className="font-bold">Visão Geral</h2>
             <select
               className="border p-2 rounded bg-white"
-              value={vendedor || ''}
-              onChange={(e) => setVendedor(e.target.value || undefined)}
+              value={vendedorVisaoGeral || ''}
+              onChange={(e) => setVendedorVisaoGeral(e.target.value || undefined)}
             >
               <option value="">Todos os vendedores</option>
               {vendedoresUnicos.map((v) => (
@@ -55,7 +56,7 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {etapas.map((etapa) => (
+              {visaoGeralFiltro.map((etapa) => (
                 <CardEtapa key={etapa.title} title={etapa.title} total={etapa.total} />
               ))}
             </div>
@@ -68,8 +69,8 @@ function App() {
             <h2 className="font-bold">Evolução por período</h2>
             <select
               className="border p-2 rounded bg-white"
-              value={vendedor || ''}
-              onChange={(e) => setVendedor(e.target.value || undefined)}
+              value={vendedorGrafico || ''}
+              onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
             >
               <option value="">Todos os vendedores</option>
               {vendedoresUnicos.map((v) => (
