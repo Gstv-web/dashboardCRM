@@ -33,9 +33,9 @@ function App() {
     <div className="main flex flex-col items-center w-full h-full overflow-auto bg-white">
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
 
-      <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center border-2 m-4">
+      <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center m-4">
         {/* 🔹 VISÃO GERAL */}
-        <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-opacity-25 rounded-2xl bg-white">
+        <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
           <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
             <select
