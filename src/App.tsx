@@ -68,7 +68,7 @@ function App() {
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
             <select
-              className="p-2 m-2 bg-white"
+              className="border p-2 rounded bg-white"
               value={vendedorGrafico || ''}
               onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
             >
@@ -81,7 +81,7 @@ function App() {
             </select>
           </div>
 
-          <div className="dashboard-grafico border-2 p-2">
+          <div className="dashboard-grafico m-2 p-2">
             <GraficoEvolucao dados={dadosGrafico} />
           </div>
         </div>
