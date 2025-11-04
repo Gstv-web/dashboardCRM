@@ -30,7 +30,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
       "Ação Pontual Firmada - 100%",
       "Operação Pró-Bono",
       "Stand-by",
-      "Encerrado/Negado",
+      // "Encerrado/Negado",
     ];
 
     return etapaTitles.map((title) => {
