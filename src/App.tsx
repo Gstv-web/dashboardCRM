@@ -64,11 +64,11 @@ function App() {
         </div>
 
         {/* 🔹 GRÁFICO DE EVOLUÇÃO */}
-        <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300">
+        <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
             <select
-              className="border p-2 rounded bg-white"
+              className="p-2 m-2 bg-white"
               value={vendedorGrafico || ''}
               onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
             >
