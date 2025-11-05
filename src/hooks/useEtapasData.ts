@@ -8,6 +8,7 @@ interface EtapaData {
 interface Item {
   id: string;
   name: string;
+  statusCliente: string;
   etapa: string;
   vendedor?: string;
 }
@@ -22,6 +23,8 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
       ? items.filter((item) => item.vendedor === vendedorSelecionado)
       : items;
 
+    const itemsAtivos = items.filter((item) => item.statusCliente === "Ativo");
+
     const etapaTitles = [
       "Prospect - 25%",
       "Oportunidade - 50%",
@@ -34,7 +37,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
     ];
 
     return etapaTitles.map((title) => {
-      const total = itemsFiltrados.filter((item) => item.etapa === title).length;
+      const total = itemsAtivos.filter((item) => item.etapa === title).length;
       return { title, total };
     });
   }, [items, vendedorSelecionado]);
