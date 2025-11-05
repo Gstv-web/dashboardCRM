@@ -39,7 +39,7 @@ function App() {
           <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
             <div>
-              <span className='ml-3'>Filtrar por vendedor:</span>
+              <span className='mr-3'>Filtrar por vendedor:</span>
               <select
                 className="border p-2 rounded bg-white"
                 value={vendedorVisaoGeral || ''}
@@ -71,7 +71,7 @@ function App() {
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
             <div>
-              <span className="ml-3">Filtrar por vendedor:</span>
+              <span className="mr-3">Filtrar por vendedor:</span>
               <select
                 className="border p-2 rounded bg-white"
                 value={vendedorGrafico || ''}
