@@ -38,6 +38,7 @@ function App() {
         <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
           <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
+            <span>Filtrar por vendedor:</span>
             <select
               className="border p-2 rounded bg-white"
               value={vendedorVisaoGeral || ''}
@@ -67,6 +68,7 @@ function App() {
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
+            <span>Filtrar por vendedor:</span>
             <select
               className="border p-2 rounded bg-white"
               value={vendedorGrafico || ''}
