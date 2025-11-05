@@ -55,7 +55,7 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
 
   const cores = [
     "#2563eb",
-    "#f59e0b",
+    "#f8e800ff",
     "#17d45c",
     "#135c25ff",
     "#dc2626",
