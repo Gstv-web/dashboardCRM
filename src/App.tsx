@@ -68,19 +68,21 @@ function App() {
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           <div className="dashboard-filtro flex justify-between items-center p-4">
             <h2 className="font-bold">Evolução por período</h2>
-            <span className="ml-auto">Filtrar por vendedor:</span>
-            <select
-              className="border p-2 rounded bg-white"
-              value={vendedorGrafico || ''}
-              onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
-            >
-              <option value="">Todos os vendedores</option>
-              {vendedoresUnicos.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
+            <div>
+              <span className="ml-auto">Filtrar por vendedor:</span>
+              <select
+                className="border p-2 rounded bg-white"
+                value={vendedorGrafico || ''}
+                onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
+              >
+                <option value="">Todos os vendedores</option>
+                {vendedoresUnicos.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="dashboard-grafico m-2 p-2">
