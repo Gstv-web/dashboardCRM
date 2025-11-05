@@ -20,7 +20,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
     // const itemsPorVendedor = vendedorSelecionado ? items.filter((item) => item.column_values.some((col) => col.id === "dropdown_mksy1g2t" && col.text === vendedorSelecionado)) : items;
    
     const itemsFiltrados = vendedorSelecionado
-      ? items.filter((item) => item.vendedor === vendedorSelecionado)
+      ? items.filter((item) => item.statusCliente === "Ativo" && item.vendedor === vendedorSelecionado)
       : items;
 
     const itemsAtivos = items.filter((item) => item.statusCliente === "Ativo");
@@ -37,7 +37,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
     ];
 
     return etapaTitles.map((title) => {
-      const total = itemsAtivos.filter((item) => item.etapa === title).length;
+      const total = itemsFiltrados.filter((item) => item.etapa === title).length;
       return { title, total };
     });
   }, [items, vendedorSelecionado]);
