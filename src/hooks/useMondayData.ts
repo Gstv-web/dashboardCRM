@@ -41,6 +41,8 @@ export function useMondayData(boardId: number | null) {
           }
 
           // 🔹 [TRECHO ADICIONADO AQUI] Normalização dos dados brutos:
+          // ISSO AQUI É O OBJETO QUE ESTÁ SENDO UTILIZADO NA APLICAÇÃO TODA,
+          // SE EU QUISER ADICIONAR MAIS CAMPOS, É AQUI.
           const normalized = page.items.map((item: any) => ({
             id: item.id,
             name: item.name,
