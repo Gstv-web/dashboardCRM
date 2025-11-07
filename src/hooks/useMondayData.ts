@@ -44,6 +44,7 @@ export function useMondayData(boardId: number | null) {
           const normalized = page.items.map((item: any) => ({
             id: item.id,
             name: item.name,
+            status: getText(item, "status2"),
             etapa: getText(item, "status6__1"),
             vendedor: getText(item, "dropdown_mksy1g2t"),
             cliente: getText(item, "pessoas1__1"),
