@@ -16,13 +16,12 @@ interface Item {
 export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
   return useMemo(() => {
     if (!items.length) return [];
-    console.log("itens em useEtapasData:", items)
+    // console.log("itens em useEtapasData:", items)
     // const itemsPorVendedor = vendedorSelecionado ? items.filter((item) => item.column_values.some((col) => col.id === "dropdown_mksy1g2t" && col.text === vendedorSelecionado)) : items;
    
     const itemsFiltrados = vendedorSelecionado
       ? items.filter((item) => item.status === "Ativo" && item.vendedor === vendedorSelecionado)
       : items;
-    console.log("itens filtrados", itemsFiltrados);
 
     const itemsAtivos = items.filter((item) => item.status === "Ativo");
     console.log("itens ativos:", itemsAtivos);
