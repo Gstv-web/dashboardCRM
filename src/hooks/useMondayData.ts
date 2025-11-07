@@ -76,7 +76,7 @@ export function useMondayData(boardId: number | null) {
 
             setItems(allItems);
             setIsLoading(false);
-            console.log("printar etapas", items);
+            
           }
         })
         .catch((err: any) => {

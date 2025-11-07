@@ -21,7 +21,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
    
     const itemsFiltrados = vendedorSelecionado
       ? items.filter((item) => item.status === "Ativo" && item.vendedor === vendedorSelecionado)
-      : items;
+      : items.filter((item) => item.status === "Ativo");
 
     const itemsAtivos = items.filter((item) => item.status === "Ativo");
     console.log("itens ativos:", itemsAtivos);
