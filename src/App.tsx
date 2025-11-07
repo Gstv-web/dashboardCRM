@@ -18,10 +18,9 @@ function App() {
     new Set(items.map((i) => i.vendedor).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
-  const itemsAtivos = items.filter((item) => item.statusCliente === "Ativo");
-  console.log("items ativos, em App.tsx:", itemsAtivos)
+
   // 🔹 Visão geral
-  const visaoGeralFiltro = useEtapasData(itemsAtivos, vendedorVisaoGeral);
+  const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
   // 🔹 Gráfico
   const itensFiltrados = useMemo(() => {
