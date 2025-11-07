@@ -24,7 +24,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
       : items;
 
     const itemsAtivos = items.filter((item) => item.statusCliente === "Ativo");
-
+    console.log("itens ativos:", itemsAtivos);
     
     const etapaTitles = [
       "Prospect - 25%",
