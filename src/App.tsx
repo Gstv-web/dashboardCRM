@@ -13,6 +13,17 @@ function App() {
   const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string | undefined>();
   const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
 
+  // cores para os cards
+  const cores = [
+    "#2563eb",
+    "#f8e800ff",
+    "#17d45c",
+    "#135c25ff",
+    "#dc2626",
+    "#da810cff",
+    "#64748b",
+  ];
+
   // 🔹 Vendedores únicos (ordenados)
   const vendedoresUnicos = Array.from(
     new Set(items.map((i) => i.vendedor).filter(Boolean))
@@ -60,8 +71,8 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {visaoGeralFiltro.map((etapa) => (
-                <CardEtapa key={etapa.title} title={etapa.title} total={etapa.total} />
+              {visaoGeralFiltro.map((etapa, index) => (
+                <CardEtapa key={etapa.title} title={etapa.title} total={etapa.total} titleColor={cores[index % cores.length]} />
               ))}
             </div>
           )}
