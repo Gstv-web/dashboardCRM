@@ -129,7 +129,7 @@ function App() {
   // cores para os cards
   const cores = [
     "#2563eb",
-    "#f8e800ff",
+    "#d8ca08ff",
     "#17d45c",
     "#135c25ff",
     "#dc2626",
