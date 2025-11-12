@@ -18,10 +18,10 @@ function App() {
     "#2563eb",
     "#f8e800ff",
     "#17d45c",
+    "#1d8336ff",
     "#135c25ff",
-    "#dc2626",
-    "#da810cff",
-    "#64748b",
+    "#0abdddff",
+    "#e97304ff",
   ];
 
   // 🔹 Vendedores únicos (ordenados)
