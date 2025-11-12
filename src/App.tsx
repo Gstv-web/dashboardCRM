@@ -243,9 +243,9 @@ function App() {
               </>
             )}
 
-            {abaAtiva === "Comparativo" && (
+            {abaAtiva === "Outro gráfico" && (
               <div className="flex justify-center items-center h-64 text-gray-500">
-                <p>🚧 Aqui entrará o gráfico comparativo futuramente</p>
+                <p>🚧 Aqui entrará outros gráficos</p>
               </div>
             )}
           </div>
