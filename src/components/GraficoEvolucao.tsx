@@ -16,6 +16,8 @@ export interface EvolucaoEtapa {
   dias14: number;
   dias21: number;
   dias30: number;
+  dias60: number;
+  dias90: number;
 }
 
 interface GraficoEvolucaoProps {
@@ -31,6 +33,8 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
 
   // 🔹 Reestrutura os dados para o formato usado pelo LineChart
   const dadosTransformados = [
+    { periodo: "90 dias" },
+    { periodo: "60 dias" },
     { periodo: "30 dias" },
     { periodo: "21 dias" },
     { periodo: "14 dias" },
@@ -46,7 +50,11 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
           ? etapa.dias14
           : linha.periodo === "21 dias"
           ? etapa.dias21
-          : etapa.dias30;
+          : linha.periodo === "30 dias"
+          ? etapa.dias30
+          : linha.periodo === "60 dias"
+          ? etapa.dias60
+          : etapa.dias90;
       resultado[etapa.etapa] = valor;
     });
 

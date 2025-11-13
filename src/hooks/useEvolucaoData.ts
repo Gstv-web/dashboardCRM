@@ -21,6 +21,8 @@ export interface EvolucaoEtapa {
   dias14: number;
   dias21: number;
   dias30: number;
+  dias60: number;
+  dias90: number;
 }
 
 /** Config */
@@ -84,12 +86,14 @@ export function useEvolucaoData(items: Item[], vendedorSelecionado?: string): Ev
       { key: "dias14" as const, start: 8, end: 14 },
       { key: "dias21" as const, start: 15, end: 21 },
       { key: "dias30" as const, start: 22, end: 30 },
+      { key: "dias60" as const, start: 31, end: 60 },
+      { key: "dias90" as const, start: 61, end: 90 },
     ];
 
     const resultados: EvolucaoEtapa[] = [];
 
     for (const [etapa, campoData] of Object.entries(etapasMap)) {
-      const contagens = { dias7: 0, dias14: 0, dias21: 0, dias30: 0 };
+      const contagens = { dias7: 0, dias14: 0, dias21: 0, dias30: 0, dias60: 0, dias90: 0 };
 
       for (const it of itensFiltrados) {
         if (it.etapa.trim() !== etapa) continue;
