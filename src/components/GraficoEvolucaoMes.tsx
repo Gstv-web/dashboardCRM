@@ -1,4 +1,3 @@
-import React from "react";
 import {
   LineChart,
   Line,
@@ -10,30 +9,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export interface EvolucaoEtapaMes {
-  etapa: string;
-  total: number; // total da etapa no mês atual
+interface Props {
+  dados: any[];
 }
 
-interface GraficoEvolucaoMesProps {
-  dados: EvolucaoEtapaMes[];
-}
-
-/**
- * Gráfico de evolução por etapa — mês atual
- */
-export default function GraficoEvolucaoMes({ dados }: GraficoEvolucaoMesProps) {
+export default function GraficoEvolucaoMes({ dados }: Props) {
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
-
-  // 🔹 Estrutura única para o mês atual
-  const dadosTransformados: Record<string, number | string> = {
-    periodo: "Mês Atual",
-  };
-
-  dados.forEach((etapa) => {
-    dadosTransformados[etapa.etapa] = etapa.total;
-  });
 
   const cores = [
     "#2563eb",
@@ -45,28 +27,26 @@ export default function GraficoEvolucaoMes({ dados }: GraficoEvolucaoMesProps) {
     "#64748b",
   ];
 
+  const etapas = Object.keys(dados[0]).filter((k) => k !== "dia");
+
   return (
     <div className="w-full h-[400px]">
       <ResponsiveContainer>
-        <LineChart
-          data={[dadosTransformados]} // só 1 ponto
-          margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
-        >
+        <LineChart data={dados}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="periodo" />
+          <XAxis dataKey="dia" />
           <YAxis allowDecimals={false} />
           <Tooltip />
           <Legend />
 
-          {dados.map((etapa, index) => (
+          {etapas.map((etapa, i) => (
             <Line
-              key={etapa.etapa}
+              key={etapa}
               type="monotone"
-              dataKey={etapa.etapa}
-              stroke={cores[index % cores.length]}
-              strokeWidth={3}
-              dot={{ r: 6 }}
-              activeDot={{ r: 8 }}
+              dataKey={etapa}
+              stroke={cores[i % cores.length]}
+              strokeWidth={2}
+              dot={false}
             />
           ))}
         </LineChart>
