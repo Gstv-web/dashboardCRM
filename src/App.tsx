@@ -243,7 +243,7 @@ function App() {
               </>
             )}
 
-            {abaAtiva === "Outro gráfico" && (
+            {abaAtiva === "Comparativo" && (
               <div className="flex justify-center items-center h-64 text-gray-500">
                 <p>🚧 Aqui entrará outros gráficos</p>
               </div>
