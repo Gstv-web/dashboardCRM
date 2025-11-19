@@ -10,7 +10,7 @@ export interface Item {
   valor_ativacao?: string;
   valor_manutencao?: string;
   datas: Record<
-    "prospect" | "oportunidade" | "forecast" | "contrato" | "encerrado" | "standby",
+    "prospect" | "oportunidade" | "forecast" | "contrato" | "acaopontual" | "encerrado" | "standby",
     string | Date | null | undefined
   >;
 }
@@ -77,6 +77,7 @@ export function useEvolucaoData(items: Item[], vendedorSelecionado?: string): Ev
       "Oportunidade - 50%": "oportunidade",
       "Forecast - 75%": "forecast",
       "Contrato Firmado - 100%": "contrato",
+      "Ação Pontual Firmada - 100%": "acaopontual",
       "Encerrado/Negado": "encerrado",
       "Stand-by": "standby",
     };

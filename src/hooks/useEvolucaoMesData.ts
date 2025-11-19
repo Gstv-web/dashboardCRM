@@ -11,6 +11,7 @@ export interface Item {
     | "oportunidade"
     | "forecast"
     | "contrato"
+    | "acaopontual"
     | "encerrado"
     | "standby",
     string | Date | null | undefined
@@ -48,6 +49,7 @@ export function useEvolucaoMesData(
       "Oportunidade - 50%": "oportunidade",
       "Forecast - 75%": "forecast",
       "Contrato Firmado - 100%": "contrato",
+      "Ação Pontual Firmada - 100%": "acaopontual",
       "Encerrado/Negado": "encerrado",
       "Stand-by": "standby",
     } as const;
