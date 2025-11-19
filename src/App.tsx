@@ -95,8 +95,8 @@ function App() {
                 key={i}
                 onClick={() => setAbaAtiva(aba)}
                 className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
-                    ? "border-b-4 border-blue-600 text-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "border-b-4 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 {aba}
@@ -134,34 +134,32 @@ function App() {
             )}
 
             {abaAtiva === "Comparativo" && (
-              <div className="flex justify-center items-center h-64 text-gray-500">
-                <>
-                  <div className="dashboard-filtro flex justify-between items-center p-4">
-                    <h2 className="font-bold">Evolução por período</h2>
-                    <div>
-                      <span className="mr-3">Filtrar por vendedor:</span>
-                      <select
-                        className="border p-2 rounded bg-white"
-                        value={vendedorGrafico || ""}
-                        onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
-                      >
-                        <option value="">Todos os vendedores</option>
-                        {vendedoresUnicos.map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+              <>
+                <div className="dashboard-filtro flex justify-between items-center p-4">
+                  <h2 className="font-bold">Evolução no mês atual</h2>
+                  <div>
+                    <span className="mr-3">Filtrar por vendedor:</span>
+                    <select
+                      className="border p-2 rounded bg-white"
+                      value={vendedorGrafico || ""}
+                      onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
+                    >
+                      <option value="">Todos os vendedores</option>
+                      {vendedoresUnicos.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
                   </div>
+                </div>
 
-                  <div className="dashboard-grafico m-2 p-2">
-                    <GraficoEvolucaoMes dados={dadosGraficoMes} />
-                  </div>
-                </>
-
-              </div>
+                <div className="dashboard-grafico m-2 p-2">
+                  <GraficoEvolucaoMes dados={dadosGraficoMes} />
+                </div>
+              </>
             )}
+
           </div>
         </div>
       </div>
