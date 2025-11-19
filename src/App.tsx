@@ -219,7 +219,7 @@ function App() {
             {abaAtiva === "Evolução 90d" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
-                  {/* <h2 className="font-bold">Evolução por período</h2> */}
+                  <h2 className="font-bold">Evolução por período</h2>
                   <div>
                     <span className="mr-3">Filtrar por vendedor:</span>
                     <select
