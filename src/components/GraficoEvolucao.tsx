@@ -66,6 +66,7 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
     "#f8e800ff",
     "#17d45c",
     "#135c25ff",
+    "#00a84cff",
     "#dc2626",
     "#da810cff",
     "#64748b",

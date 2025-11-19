@@ -22,7 +22,7 @@ function App() {
     "#d8ca08ff",
     "#17d45c",
     "#135c25ff",
-    "#0d4d1dff",
+    "#00a84cff",
     "#da810cff",
     "#64748b",
   ];
