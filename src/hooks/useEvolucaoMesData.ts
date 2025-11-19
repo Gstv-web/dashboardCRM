@@ -24,7 +24,7 @@ function parseToDate(valor: any): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-export function useEvolucaoMesDataDiaria(
+export function useEvolucaoMesData(
   items: Item[],
   vendedorSelecionado?: string
 ): EvolucaoEtapaDia[] {
