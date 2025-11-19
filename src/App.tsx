@@ -14,7 +14,7 @@ function App() {
   const { items, isLoading } = useMondayData(boardId);
   const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string | undefined>();
   const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
-  const [abaAtiva, setAbaAtiva] = useState<string>('Evolução 90d'); // 🔹 nova aba ativa
+  const [abaAtiva, setAbaAtiva] = useState<string>('Evolução Mês Atual'); // 🔹 nova aba ativa
 
   // cores para os cards
   const cores = [
@@ -90,7 +90,7 @@ function App() {
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           {/* Abas */}
           <div className="flex border-b border-gray-300">
-            {["Evolução 90d", "Comparativo"].map((aba, i) => (
+            {["Evolução Mês Atual", "Evolução 90 dias"].map((aba, i) => (
               <button
                 key={i}
                 onClick={() => setAbaAtiva(aba)}
@@ -106,7 +106,7 @@ function App() {
 
           {/* Conteúdo das abas */}
           <div className="p-4">
-            {abaAtiva === "Evolução 90d" && (
+            {abaAtiva === "Evolução 90 dias" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
                   <h2 className="font-bold">Evolução por período</h2>
@@ -133,7 +133,7 @@ function App() {
               </>
             )}
 
-            {abaAtiva === "Comparativo" && (
+            {abaAtiva === "Evolução Mês Atual" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
                   <h2 className="font-bold">Evolução no mês atual</h2>
