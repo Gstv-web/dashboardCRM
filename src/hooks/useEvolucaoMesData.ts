@@ -7,13 +7,18 @@ export interface Item {
   vendedor?: string;
 
   datas: Record<
-    "prospect" | "oportunidade" | "forecast" | "contrato" | "encerrado" | "standby",
+    | "prospect"
+    | "oportunidade"
+    | "forecast"
+    | "contrato"
+    | "encerrado"
+    | "standby",
     string | Date | null | undefined
   >;
 }
 
 export interface EvolucaoEtapaDia {
-  dia: string; // "2025-02-05"
+  dia: string; // agora "05/02"
   [etapa: string]: number | string;
 }
 
@@ -51,8 +56,11 @@ export function useEvolucaoMesData(
     const grafico: EvolucaoEtapaDia[] = [];
 
     for (let dia = 1; dia <= diasNoMes; dia++) {
+      const dd = String(dia).padStart(2, "0");
+      const mm = String(mes + 1).padStart(2, "0");
+
       grafico.push({
-        dia: `${ano}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`,
+        dia: `${dd}/${mm}`, // 🔥 AGORA dd/mm
         ...Object.fromEntries(Object.keys(etapasMap).map((e) => [e, 0])),
       });
     }
