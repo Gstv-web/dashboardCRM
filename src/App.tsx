@@ -199,7 +199,7 @@ function App() {
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           {/* Abas */}
           <div className="flex border-b border-gray-300">
-            {["Evolução", "Comparativo"].map((aba, i) => (
+            {["Evolução 90d", "Comparativo"].map((aba, i) => (
               <button
                 key={i}
                 onClick={() => setAbaAtiva(aba)}
@@ -216,10 +216,10 @@ function App() {
 
           {/* Conteúdo das abas */}
           <div className="p-4">
-            {abaAtiva === "Evolução" && (
+            {abaAtiva === "Evolução 90d" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
-                  <h2 className="font-bold">Evolução por período</h2>
+                  {/* <h2 className="font-bold">Evolução por período</h2> */}
                   <div>
                     <span className="mr-3">Filtrar por vendedor:</span>
                     <select
@@ -243,7 +243,7 @@ function App() {
               </>
             )}
 
-            {abaAtiva === "Outro gráfico" && (
+            {abaAtiva === "Comparativo" && (
               <div className="flex justify-center items-center h-64 text-gray-500">
                 <p>🚧 Aqui entrará outros gráficos</p>
               </div>
