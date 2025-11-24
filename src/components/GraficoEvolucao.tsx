@@ -93,7 +93,7 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
               stroke={cores[index % cores.length]}
               strokeWidth={2}
               dot={{ r: 3 }}
-              activeDot={{ r: 5, onClick: (e) => console.log("clicou no ponto", e) }}
+              activeDot={{ r: 8, onClick: (e) => console.log("clicou no ponto", e) }}
             />
           ))}
         </LineChart>
