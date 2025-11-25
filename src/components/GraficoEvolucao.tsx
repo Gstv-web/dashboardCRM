@@ -2,6 +2,7 @@ import React from "react";
 import {
   LineChart,
   Line,
+  Dot,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -47,14 +48,14 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
         linha.periodo === "7 dias"
           ? etapa.dias7
           : linha.periodo === "14 dias"
-          ? etapa.dias14
-          : linha.periodo === "21 dias"
-          ? etapa.dias21
-          : linha.periodo === "30 dias"
-          ? etapa.dias30
-          : linha.periodo === "60 dias"
-          ? etapa.dias60
-          : etapa.dias90;
+            ? etapa.dias14
+            : linha.periodo === "21 dias"
+              ? etapa.dias21
+              : linha.periodo === "30 dias"
+                ? etapa.dias30
+                : linha.periodo === "60 dias"
+                  ? etapa.dias60
+                  : etapa.dias90;
       resultado[etapa.etapa] = valor;
     });
 
@@ -93,7 +94,14 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
               stroke={cores[index % cores.length]}
               strokeWidth={2}
               dot={{ r: 3 }}
-              activeDot={{ r: 8, onClick: (e) => console.log("clicou no ponto", e) }}
+              activeDot={(props) => (
+                <Dot
+                  {...props}
+                  r={6}
+                  onClick={() => console.log("props", props)}
+                />
+              )}
+            // activeDot={{ r: 8, onClick: (e) => console.log("clicou no ponto", e) }}
             />
           ))}
         </LineChart>
