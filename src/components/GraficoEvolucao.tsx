@@ -24,6 +24,7 @@ export interface EvolucaoEtapa {
 
 interface GraficoEvolucaoProps {
   dados: EvolucaoEtapa[];
+  onPontoClick?: (ponto: any) => void;
 }
 
 /**
