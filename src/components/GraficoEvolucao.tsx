@@ -135,6 +135,7 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                   r={5}
                   onClick={() => {
                     if (onPontoClick) {
+                      console.log("props", props)
                       const ponto = {
                         etapa: etapa.etapa,
                         periodo: props.payload.periodo,
