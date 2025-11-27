@@ -30,7 +30,7 @@ interface GraficoEvolucaoProps {
 /**
  * Gráfico de evolução das etapas ao longo de 7, 14, 21 e 30 dias
  */
-export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
+export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucaoProps) {
   const [linhaHover, setLinhaHover] = useState<string | null>(null);
 
   if (!dados?.length)
@@ -109,7 +109,22 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
                 <Dot
                   {...props}
                   r={5}
-                  onClick={() => console.log("clicou no ponto", props)}
+                  onClick={() => {
+                    console.log("clicou no ponto", props);
+
+                    if (onPontoClick) {
+                      const ponto = {
+                        etapa: etapa.etapa,
+                        periodo: props.payload.periodo,
+                        valor: props.value,
+
+                        // se você quiser listar os itens reais
+                        items: props.payload.items?.[etapa.etapa] || [],
+                      };
+
+                      onPontoClick(ponto);
+                    }
+                  }}
                   onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 também destaca no activeDot
                   onMouseLeave={() => setLinhaHover(null)}
                 />
