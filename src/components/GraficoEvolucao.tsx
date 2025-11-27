@@ -99,7 +99,7 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
               dot={(props) => (
                 <Dot
                   {...props}
-                  r={5}
+                  r={3}
                   onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 hover ON
                   onMouseLeave={() => setLinhaHover(null)}        // 👈 hover OFF
                 />
@@ -107,7 +107,7 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
               activeDot={(props) => (
                 <Dot
                   {...props}
-                  r={7}
+                  r={5}
                   onClick={() => console.log("clicou no ponto", props)}
                   onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 também destaca no activeDot
                   onMouseLeave={() => setLinhaHover(null)}
