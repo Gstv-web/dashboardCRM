@@ -17,10 +17,9 @@ function App() {
   const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
   const [abaAtiva, setAbaAtiva] = useState<string>('Evolução Mês Atual');
 
-  // ⭐ ADIÇÃO — estado do ponto clicado
+  // ⭐ ADIÇÃO — Estado do ponto selecionado no gráfico
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
 
-  // cores para os cards
   const cores = [
     "#2563eb",
     "#d8ca08ff",
@@ -31,15 +30,12 @@ function App() {
     "#64748b",
   ];
 
-  // Vendedores únicos
   const vendedoresUnicos = Array.from(
     new Set(items.map((i) => i.vendedor).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
-  // Visão Geral
   const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
-  // Filtrar vendedores no gráfico
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
     return vendedorGrafico ? items.filter((i) => i.vendedor === vendedorGrafico) : items;
@@ -54,9 +50,8 @@ function App() {
 
       <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center m-4">
 
-        {/* 🔹 VISÃO GERAL COM CARDS (NÃO FOI REMOVIDO!) */}
+        {/* VISÃO GERAL */}
         <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
-
           <div className="filtro flex justify-between items-center">
             <h2 className="font-bold">Visão Geral</h2>
 
@@ -91,7 +86,7 @@ function App() {
           )}
         </div>
 
-        {/* 🔹 GRÁFICO COM ABAS */}
+        {/* GRÁFICO COM ABAS */}
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
 
           <div className="flex border-b border-gray-300">
@@ -135,41 +130,43 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucao
                     dados={dadosGrafico}
-
-                    // ⭐ ADIÇÃO — recebendo clique do ponto
                     onPontoClick={(p) => setPontoSelecionado(p)}
                   />
                 </div>
 
-                {/* ⭐ ADIÇÃO — lista do ponto clicado */}
+                {/* ⭐ ÁREA QUE EXIBE OS ITENS DO PONTO CLICADO */}
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
                     <h3 className="font-bold text-lg mb-3">
                       {pontoSelecionado.etapa} — {pontoSelecionado.periodo}
                     </h3>
 
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b bg-gray-100">
-                          <th className="p-2 text-left">Nome</th>
-                          <th className="p-2 text-left">Fechamento</th>
-                          <th className="p-2 text-left">Valor</th>
-                          <th className="p-2 text-left">Vendedor</th>
-                          <th className="p-2 text-left">Performance</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {pontoSelecionado.items?.map((item: any) => (
-                          <tr key={item.id} className="border-b">
-                            <td className="p-2">{item.name}</td>
-                            <td className="p-2">{item.fechamento_vendas}</td>
-                            <td className="p-2">R$ {item.valor_contrato}</td>
-                            <td className="p-2">{item.vendedor}</td>
-                            <td className="p-2">{item.performance}</td>
+                    {!pontoSelecionado.items?.length ? (
+                      <p className="text-gray-500">Nenhum item neste período.</p>
+                    ) : (
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b bg-gray-100">
+                            <th className="p-2 text-left">Nome</th>
+                            <th className="p-2 text-left">Fechamento</th>
+                            <th className="p-2 text-left">Valor</th>
+                            <th className="p-2 text-left">Vendedor</th>
+                            <th className="p-2 text-left">Performance</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {pontoSelecionado.items.map((item: any) => (
+                            <tr key={item.id} className="border-b">
+                              <td className="p-2">{item.name}</td>
+                              <td className="p-2">{item.fechamento_vendas}</td>
+                              <td className="p-2">R$ {item.valor_contrato}</td>
+                              <td className="p-2">{item.vendedor}</td>
+                              <td className="p-2">{item.performance}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 )}
               </>
