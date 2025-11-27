@@ -20,6 +20,7 @@ export interface EvolucaoEtapa {
   dias30: number;
   dias60: number;
   dias90: number;
+  items?: any[];
 }
 
 interface GraficoEvolucaoProps {
@@ -45,7 +46,8 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
     { periodo: "14 dias" },
     { periodo: "7 dias" },
   ].map((linha) => {
-    const resultado: Record<string, string | number> = { periodo: linha.periodo };
+    const resultado: any = { periodo: linha.periodo };
+    // const resultado: Record<string, string | number> = { periodo: linha.periodo };
 
     dados.forEach((etapa) => {
       const valor =
@@ -61,6 +63,9 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                   ? etapa.dias60
                   : etapa.dias90;
       resultado[etapa.etapa] = valor;
+
+      if (!resultado.items) resultado.items = {};
+      resultado.items[etapa.etapa] = etapa.items ?? [];
     });
 
     return resultado;
