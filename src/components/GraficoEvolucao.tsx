@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -29,6 +30,8 @@ interface GraficoEvolucaoProps {
  * Gráfico de evolução das etapas ao longo de 7, 14, 21 e 30 dias
  */
 export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
+  const [linhaHover, setLinhaHover] = useState<string | null>(null);
+
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
@@ -92,13 +95,22 @@ export default function GraficoEvolucao({ dados }: GraficoEvolucaoProps) {
               type="monotone"
               dataKey={etapa.etapa}
               stroke={cores[index % cores.length]}
-              strokeWidth={2}
-              dot={{ r: 3 }}
+              strokeWidth={linhaHover === etapa.etapa ? 3 : 2}
+              dot={(props) => (
+                <Dot
+                  {...props}
+                  r={5}
+                  onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 hover ON
+                  onMouseLeave={() => setLinhaHover(null)}        // 👈 hover OFF
+                />
+              )}
               activeDot={(props) => (
                 <Dot
                   {...props}
-                  r={6}
-                  onClick={() => console.log("props", props)}
+                  r={7}
+                  onClick={() => console.log("clicou no ponto", props)}
+                  onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 também destaca no activeDot
+                  onMouseLeave={() => setLinhaHover(null)}
                 />
               )}
             // activeDot={{ r: 8, onClick: (e) => console.log("clicou no ponto", e) }}
