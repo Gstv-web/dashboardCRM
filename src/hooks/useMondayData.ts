@@ -49,9 +49,10 @@ export function useMondayData(boardId: number | null) {
             status: getText(item, "status2"),
             etapa: getText(item, "status6__1"),
             vendedor: getText(item, "dropdown_mksy1g2t"),
-            cliente: getText(item, "pessoas1__1"),
-            valor_ativacao: getText(item, "n_meros5"),
-            valor_manutencao: getText(item, "formula_mkrcbxzb"),
+            performance: getText(item, "pessoas1__1"),
+            valor_contrato: getText(item, "n_meros5"),
+            valor_mensal_contrato: getText(item, "formula_mkrcbxzb"),
+            fechamento_vendas: getText(item, "date_mkrbckxw"),
             datas: {
               prospect: getText(item, "data7__1"),
               oportunidade: getText(item, "date2"),
