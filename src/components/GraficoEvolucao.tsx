@@ -20,7 +20,14 @@ export interface EvolucaoEtapa {
   dias30: number;
   dias60: number;
   dias90: number;
-  items?: any[];
+  items: {
+    dias7: any[];
+    dias14: any[];
+    dias21: any[];
+    dias30: any[];
+    dias60: any[];
+    dias90: any[];
+  };
 }
 
 interface GraficoEvolucaoProps {

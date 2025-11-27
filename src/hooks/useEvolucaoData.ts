@@ -23,14 +23,14 @@ export interface EvolucaoEtapa {
   dias30: number;
   dias60: number;
   dias90: number;
-  itemsByRange?: {
-    dias7: Item[];
-    dias14: Item[];
-    dias21: Item[];
-    dias30: Item[];
-    dias60: Item[];
-    dias90: Item[];
-  };
+  items: {
+  dias7: Item[];
+  dias14: Item[];
+  dias21: Item[];
+  dias30: Item[];
+  dias60: Item[];
+  dias90: Item[];
+};
 }
 
 /** Config */
@@ -103,7 +103,7 @@ export function useEvolucaoData(items: Item[], vendedorSelecionado?: string): Ev
 
     for (const [etapa, campoData] of Object.entries(etapasMap)) {
       const contagens = { dias7: 0, dias14: 0, dias21: 0, dias30: 0, dias60: 0, dias90: 0 };
-      const itemsByRange = { dias7: [] as Item[], dias14: [] as Item[], dias21: [] as Item[], dias30: [] as Item[], dias60: [] as Item[], dias90: [] as Item[] };
+      const itemsPorFaixa = { dias7: [] as Item[], dias14: [] as Item[], dias21: [] as Item[], dias30: [] as Item[], dias60: [] as Item[], dias90: [] as Item[] };
 
       for (const it of itensFiltrados) {
         if (it.etapa.trim() !== etapa) continue;
@@ -114,6 +114,7 @@ export function useEvolucaoData(items: Item[], vendedorSelecionado?: string): Ev
         for (const r of ranges) {
           if (diff >= r.start && diff <= r.end) {
             contagens[r.key] += 1;
+            itemsPorFaixa[r.key].push(it);
             break;
           }
         }
@@ -122,7 +123,7 @@ export function useEvolucaoData(items: Item[], vendedorSelecionado?: string): Ev
       resultados.push({
         etapa,
         ...contagens,
-        itemsByRange,
+        items: itemsPorFaixa,
       });
     }
 
