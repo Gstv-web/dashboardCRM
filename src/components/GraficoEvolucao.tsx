@@ -35,16 +35,26 @@ interface GraficoEvolucaoProps {
   onPontoClick?: (ponto: any) => void;
 }
 
-/**
- * Gráfico de evolução das etapas ao longo de 7, 14, 21 e 30 dias
- */
 export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucaoProps) {
   const [linhaHover, setLinhaHover] = useState<string | null>(null);
 
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
-  // 🔹 Reestrutura os dados para o formato usado pelo LineChart
+  // 🔹 Mapeamento período → chave correta dos items
+  function periodoToKey(periodo: string): keyof EvolucaoEtapa["items"] {
+    switch (periodo) {
+      case "7 dias": return "dias7";
+      case "14 dias": return "dias14";
+      case "21 dias": return "dias21";
+      case "30 dias": return "dias30";
+      case "60 dias": return "dias60";
+      case "90 dias": return "dias90";
+      default: return "dias7";
+    }
+  }
+
+  // 🔹 Reestrutura os dados
   const dadosTransformados = [
     { periodo: "90 dias" },
     { periodo: "60 dias" },
@@ -54,10 +64,9 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
     { periodo: "7 dias" },
   ].map((linha) => {
     const resultado: any = { periodo: linha.periodo };
-    // const resultado: Record<string, string | number> = { periodo: linha.periodo };
 
     dados.forEach((etapa) => {
-      const valor =
+      const key =
         linha.periodo === "7 dias"
           ? etapa.dias7
           : linha.periodo === "14 dias"
@@ -69,10 +78,13 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                 : linha.periodo === "60 dias"
                   ? etapa.dias60
                   : etapa.dias90;
-      resultado[etapa.etapa] = valor;
 
+      resultado[etapa.etapa] = key;
+
+      // 🔹 Adiciona corretamente os items da faixa do período
       if (!resultado.items) resultado.items = {};
-      resultado.items[etapa.etapa] = etapa.items ?? [];
+      const faixa = periodoToKey(linha.periodo);
+      resultado.items[etapa.etapa] = etapa.items[faixa];
     });
 
     return resultado;
@@ -113,8 +125,8 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                 <Dot
                   {...props}
                   r={3}
-                  onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 hover ON
-                  onMouseLeave={() => setLinhaHover(null)}        // 👈 hover OFF
+                  onMouseEnter={() => setLinhaHover(etapa.etapa)}
+                  onMouseLeave={() => setLinhaHover(null)}
                 />
               )}
               activeDot={(props) => (
@@ -122,26 +134,21 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                   {...props}
                   r={5}
                   onClick={() => {
-                    console.log("clicou no ponto", props);
-
                     if (onPontoClick) {
                       const ponto = {
                         etapa: etapa.etapa,
                         periodo: props.payload.periodo,
                         valor: props.value,
-
-                        // se você quiser listar os itens reais
                         items: props.payload.items?.[etapa.etapa] || [],
                       };
 
                       onPontoClick(ponto);
                     }
                   }}
-                  onMouseEnter={() => setLinhaHover(etapa.etapa)} // 👈 também destaca no activeDot
+                  onMouseEnter={() => setLinhaHover(etapa.etapa)}
                   onMouseLeave={() => setLinhaHover(null)}
                 />
               )}
-            // activeDot={{ r: 8, onClick: (e) => console.log("clicou no ponto", e) }}
             />
           ))}
         </LineChart>
