@@ -8,6 +8,7 @@ export interface Item {
   vendedor?: string;
   cliente?: string;
   valor_ativacao?: string;
+  fechamento_vendas?: string;
   valor_manutencao?: string;
   datas: Record<
     "prospect" | "oportunidade" | "forecast" | "contrato" | "acaopontual" | "encerrado" | "standby",
