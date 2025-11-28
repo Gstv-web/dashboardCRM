@@ -44,6 +44,14 @@ function App() {
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
 
+  // FUNÇÕES RENDER
+  function formatarData(iso: string | Date | null | undefined) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+  }
+
   return (
     <div className="main flex flex-col items-center w-full h-full overflow-auto bg-white">
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
@@ -94,11 +102,10 @@ function App() {
               <button
                 key={i}
                 onClick={() => setAbaAtiva(aba)}
-                className={`px-6 py-3 font-semibold transition-colors duration-200 ${
-                  abaAtiva === aba
+                className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
                     ? "border-b-4 border-blue-600 text-blue-600"
                     : "text-gray-500 hover:text-gray-700"
-                }`}
+                  }`}
               >
                 {aba}
               </button>
@@ -158,7 +165,7 @@ function App() {
                           {pontoSelecionado.items.map((item: any) => (
                             <tr key={item.id} className="border-b">
                               <td className="p-2">{item.name}</td>
-                              <td className="p-2">{item.fechamento_vendas}</td>
+                              <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
                               <td className="p-2">R$ {item.valor_contrato}</td>
                               <td className="p-2">{item.vendedor}</td>
                               <td className="p-2">{item.performance}</td>
