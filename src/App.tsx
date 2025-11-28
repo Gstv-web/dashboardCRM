@@ -52,6 +52,15 @@ function App() {
     return d.toLocaleDateString("pt-BR", { timeZone: "UTC" });
   }
 
+  function formatarDinheiro(valor: number | string | null | undefined): string {
+    const n = Number(valor ?? 0);
+    return n.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+
   return (
     <div className="main flex flex-col items-center w-full h-full overflow-auto bg-white">
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
@@ -103,8 +112,8 @@ function App() {
                 key={i}
                 onClick={() => setAbaAtiva(aba)}
                 className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
-                    ? "border-b-4 border-blue-600 text-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "border-b-4 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 {aba}
@@ -166,7 +175,7 @@ function App() {
                             <tr key={item.id} className="border-b">
                               <td className="p-2">{item.name}</td>
                               <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
-                              <td className="p-2">R$ {item.valor_contrato}</td>
+                              <td className="p-2">R$ {formatarDinheiro(item.valor_contrato)}</td>
                               <td className="p-2">{item.vendedor}</td>
                               <td className="p-2">{item.performance}</td>
                             </tr>
