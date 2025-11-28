@@ -7,9 +7,9 @@ export interface Item {
   etapa: string;
   vendedor?: string;
   cliente?: string;
-  valor_ativacao?: string;
+  valor_contrato?: string;
   fechamento_vendas?: string;
-  valor_manutencao?: string;
+  valor_mensal_contrato?: string;
   datas: Record<
     "prospect" | "oportunidade" | "forecast" | "contrato" | "acaopontual" | "encerrado" | "standby",
     string | Date | null | undefined
