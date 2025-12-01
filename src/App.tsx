@@ -19,7 +19,6 @@ function App() {
 
   // ⭐ ADIÇÃO — Estado do ponto selecionado no gráfico
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
-  const [etapaFiltro, setEtapaFiltro] = useState<string | "">("");
 
   const cores = [
     "#2563eb",
@@ -43,6 +42,7 @@ function App() {
   }, [items, vendedorGrafico]);
 
   const dadosGrafico = useEvolucaoData(itensFiltrados);
+  console.log("dadosGrafico no render:", dadosGrafico);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
 
   // FUNÇÕES RENDER
@@ -147,17 +147,7 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucao
                     dados={dadosGrafico}
-                    onPontoClick={(p) => {
-                      const itensPeriodo = itensFiltrados.filter((item) => {
-                        return item.periodo === p.periodo;
-                      });
-                      setPontoSelecionado({
-                        periodo: p.periodo,
-                        etpa: p.etapa,
-                        itensPeriodo
-                      })
-                      setEtapaFiltro("");
-                    }}
+                    onPontoClick={(p) => {setPontoSelecionado(p)}}
                   />
                 </div>
 
