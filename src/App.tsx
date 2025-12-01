@@ -147,7 +147,11 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucao
                     dados={dadosGrafico}
-                    onPontoClick={(p) => {setPontoSelecionado(p)}}
+                    onPontoClick={(p) => {
+                      const todosItens = dadosGrafico.flatMap((etapa => {
+                        return etapa.items[p.periodo as keyof typeof etapa.items] || [];
+                      }))
+                    }}
                   />
                 </div>
 
