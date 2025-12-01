@@ -155,7 +155,7 @@ function App() {
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
                     <h3 className="font-bold text-lg mb-3">
-                      {pontoSelecionado.etapa} — {pontoSelecionado.periodo}
+                      {pontoSelecionado.periodo}
                     </h3>
 
                     {!pontoSelecionado.items?.length ? (
@@ -177,6 +177,7 @@ function App() {
                               <td className="p-2">{item.name}</td>
                               <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
                               <td className="p-2">R$ {formatarDinheiro(item.valor_contrato)}</td>
+                              <td className="p-2">{item.etapa}</td>
                               <td className="p-2">{item.vendedor}</td>
                               <td className="p-2">{item.performance}</td>
                             </tr>
