@@ -151,6 +151,10 @@ function App() {
                       const todosItens = dadosGrafico.flatMap((etapa => {
                         return etapa.items[p.periodo as keyof typeof etapa.items] || [];
                       }))
+                      setPontoSelecionado({
+                        ...p,
+                        items: todosItens,
+                      });
                     }}
                   />
                 </div>
