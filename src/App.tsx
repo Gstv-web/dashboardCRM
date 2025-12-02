@@ -149,7 +149,7 @@ function App() {
                     dados={dadosGrafico}
                     onPontoClick={(p) => {
                       const todosItens = dadosGrafico.flatMap((etapa => {
-                        return etapa.items[p.periodo as keyof typeof etapa.items] || [];
+                        return etapa.items || [];
                       }))
                       setPontoSelecionado({
                         ...p,
