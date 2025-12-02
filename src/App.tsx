@@ -149,13 +149,13 @@ function App() {
                     dados={dadosGrafico}
                     onPontoClick={(p) => {
                       const todosItens = dadosGrafico.flatMap((etapa => {
-                        return etapa.items || [];
+                        return etapa.items[p.periodo as keyof typeof etapa.items] || [];
                       }))
                       setPontoSelecionado({
                         ...p,
                         items: todosItens,
                       });
-                      console.log("clicou no ponto", p, "itens:", todosItens);
+                      console.log("clicou no ponto", p, "etapa.items:", todosItens);
                     }}
                   />
                 </div>
