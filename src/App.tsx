@@ -155,6 +155,7 @@ function App() {
                         ...p,
                         items: todosItens,
                       });
+                      console.log("clicou no ponto", p, "itens:", todosItens);
                     }}
                   />
                 </div>
