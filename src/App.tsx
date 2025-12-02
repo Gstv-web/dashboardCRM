@@ -156,6 +156,9 @@ function App() {
                         items: todosItens,
                       });
                       console.log("clicou no ponto", p, "etapa.items:", todosItens);
+                      dadosGrafico.forEach((et, i) => {
+                        console.log(`Etapa ${et.etapa} → keys`, Object.keys(et.items));
+                      });
                     }}
                   />
                 </div>
