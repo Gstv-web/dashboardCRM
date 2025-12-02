@@ -166,7 +166,7 @@ function App() {
                       }))
                       setPontoSelecionado({
                         ...p,
-                        items: todosItens,
+                        items: [...todosItens].sort((a, b) => a.etapa.localeCompare(b.etapa)),
                       });
                       console.log("itens ponto selecionado", pontoSelecionado);
                       // dadosGrafico.forEach((et, i) => {
@@ -183,7 +183,7 @@ function App() {
                       <h3 className="font-bold text-lg mb-3">
                         {pontoSelecionado.periodo}
                       </h3>
-                      <p>select vem aqui</p>
+                      <select className="">select vem aqui</select>
                     </div>
 
                     {!pontoSelecionado.items?.length ? (
