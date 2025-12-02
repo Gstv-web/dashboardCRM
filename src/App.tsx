@@ -179,9 +179,12 @@ function App() {
                 {/* ⭐ ÁREA QUE EXIBE OS ITENS DO PONTO CLICADO */}
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
-                    <h3 className="font-bold text-lg mb-3">
-                      {pontoSelecionado.periodo}
-                    </h3>
+                    <div className="flex">
+                      <h3 className="font-bold text-lg mb-3">
+                        {pontoSelecionado.periodo}
+                      </h3>
+                      <p>select vem aqui</p>
+                    </div>
 
                     {!pontoSelecionado.items?.length ? (
                       <p className="text-gray-500">Nenhum item neste período.</p>
