@@ -1,5 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { EvolucaoEtapa, PeriodoChave } from "../hooks/useEvolucaoData";
 import {
   LineChart,
   Line,
@@ -12,22 +12,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export interface EvolucaoEtapa {
-  etapa: string;
-  dias7: number;
-  dias14: number;
-  dias21: number;
-  dias30: number;
-  dias60: number;
-  dias90: number;
-  items: {
-    dias7: any[];
-    dias14: any[];
-    dias21: any[];
-    dias30: any[];
-    dias60: any[];
-    dias90: any[];
-  };
+interface Item {
+  id: string;
+  name: string;
+  fechamento_vendas?: string;
+  valor_contrato?: number;
+  vendedor?: string;
+  etapa?: string;
+  performance?: string;
 }
 
 interface GraficoEvolucaoProps {
@@ -41,8 +33,8 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
-  // 🔹 Mapeamento período → chave correta dos items
-  function periodoToKey(periodo: string): keyof EvolucaoEtapa["items"] {
+  /** 🔹 Converte "7 dias" → "dias7" */
+  function periodoToKey(periodo: string): PeriodoChave {
     switch (periodo) {
       case "7 dias": return "dias7";
       case "14 dias": return "dias14";
@@ -54,7 +46,7 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
     }
   }
 
-  // 🔹 Reestrutura os dados
+  /** 🔹 Reestrutura dados para o gráfico */
   const dadosTransformados = [
     { periodo: "90 dias" },
     { periodo: "60 dias" },
@@ -64,27 +56,15 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
     { periodo: "7 dias" },
   ].map((linha) => {
     const resultado: any = { periodo: linha.periodo };
+    const key = periodoToKey(linha.periodo);
 
     dados.forEach((etapa) => {
-      const key =
-        linha.periodo === "7 dias"
-          ? etapa.dias7
-          : linha.periodo === "14 dias"
-            ? etapa.dias14
-            : linha.periodo === "21 dias"
-              ? etapa.dias21
-              : linha.periodo === "30 dias"
-                ? etapa.dias30
-                : linha.periodo === "60 dias"
-                  ? etapa.dias60
-                  : etapa.dias90;
+      // valores numéricos da linha — AGORA CORRETO
+      resultado[etapa.etapa] = etapa.items[key].length;
 
-      resultado[etapa.etapa] = key;
-
-      // 🔹 Adiciona corretamente os items da faixa do período
+      // itens da faixa
       if (!resultado.items) resultado.items = {};
-      const faixa = periodoToKey(linha.periodo);
-      resultado.items[etapa.etapa] = etapa.items[faixa];
+      resultado.items[etapa.etapa] = etapa.items[key];
     });
 
     return resultado;
@@ -135,14 +115,12 @@ export default function GraficoEvolucao({ dados, onPontoClick }: GraficoEvolucao
                   r={5}
                   onClick={() => {
                     if (onPontoClick) {
-                      console.log("props", props)
                       const ponto = {
                         etapa: etapa.etapa,
                         periodo: props.payload.periodo,
                         valor: props.value,
                         items: props.payload.items?.[etapa.etapa] || [],
                       };
-
                       onPontoClick(ponto);
                     }
                   }}

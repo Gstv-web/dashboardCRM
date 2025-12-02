@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useEtapasData } from './hooks/useEtapasData';
 import { useMondayContext } from './hooks/useMondayContext';
 import { useMondayData } from './hooks/useMondayData';
-import { useEvolucaoData } from './hooks/useEvolucaoData';
+import { useEvolucaoData, PeriodoChave } from './hooks/useEvolucaoData';
 import { useEvolucaoMesData } from './hooks/useEvolucaoMesData';
 import CardEtapa from './components/CardEtapa';
 import GraficoEvolucao from './components/GraficoEvolucao';
@@ -148,17 +148,30 @@ function App() {
                   <GraficoEvolucao
                     dados={dadosGrafico}
                     onPontoClick={(p) => {
+                      const mapaPeriodos: Record<string, PeriodoChave> = {
+                        "7 dias": "dias7",
+                        "14 dias": "dias14",
+                        "21 dias": "dias21",
+                        "30 dias": "dias30",
+                        "60 dias": "dias60",
+                        "90 dias": "dias90",
+                      };
+                      const chave = mapaPeriodos[p.periodo];
+                      if (!chave) {
+                        console.warn("❌ Período sem chave correspondente:", p.periodo);
+                        return;
+                      }
                       const todosItens = dadosGrafico.flatMap((etapa => {
-                        return etapa.items[p.periodo as keyof typeof etapa.items] || [];
+                        return etapa.items[chave] ?? [];
                       }))
                       setPontoSelecionado({
                         ...p,
                         items: todosItens,
                       });
                       console.log("clicou no ponto", p, "etapa.items:", todosItens);
-                      dadosGrafico.forEach((et, i) => {
-                        console.log(`Etapa ${et.etapa} → keys`, Object.keys(et.items));
-                      });
+                      // dadosGrafico.forEach((et, i) => {
+                      //   console.log(`Etapa ${et.etapa} → keys`, Object.keys(et.items));
+                      // });
                     }}
                   />
                 </div>

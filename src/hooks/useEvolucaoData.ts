@@ -16,22 +16,35 @@ export interface Item {
   >;
 }
 
+export type PeriodoChave =
+  | "dias7"
+  | "dias14"
+  | "dias21"
+  | "dias30"
+  | "dias60"
+  | "dias90";
+
+// export interface EvolucaoEtapa {
+//   etapa: string;
+//   dias7: number;
+//   dias14: number;
+//   dias21: number;
+//   dias30: number;
+//   dias60: number;
+//   dias90: number;
+//   items: {
+//     dias7: Item[];
+//     dias14: Item[];
+//     dias21: Item[];
+//     dias30: Item[];
+//     dias60: Item[];
+//     dias90: Item[];
+//   };
+// }
+
 export interface EvolucaoEtapa {
   etapa: string;
-  dias7: number;
-  dias14: number;
-  dias21: number;
-  dias30: number;
-  dias60: number;
-  dias90: number;
-  items: {
-  dias7: Item[];
-  dias14: Item[];
-  dias21: Item[];
-  dias30: Item[];
-  dias60: Item[];
-  dias90: Item[];
-};
+  items: Record<PeriodoChave, Item[]>;
 }
 
 /** Config */
