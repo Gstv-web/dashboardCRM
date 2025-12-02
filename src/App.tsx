@@ -168,7 +168,7 @@ function App() {
                         ...p,
                         items: todosItens,
                       });
-                      console.log("clicou no ponto", p, "etapa.items:", todosItens);
+                      console.log("itens ponto selecionado", pontoSelecionado);
                       // dadosGrafico.forEach((et, i) => {
                       //   console.log(`Etapa ${et.etapa} → keys`, Object.keys(et.items));
                       // });
