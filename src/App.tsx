@@ -1,27 +1,27 @@
-import { useState, useMemo } from 'react';
-import { useEtapasData } from './hooks/useEtapasData';
-import { useMondayContext } from './hooks/useMondayContext';
-import { useMondayData } from './hooks/useMondayData';
-import { useEvolucaoData, PeriodoChave } from './hooks/useEvolucaoData';
-import { useEvolucaoMesData } from './hooks/useEvolucaoMesData';
-import CardEtapa from './components/CardEtapa';
-import GraficoEvolucao from './components/GraficoEvolucao';
-import GraficoEvolucaoMes from './components/GraficoEvolucaoMes';
-import './App.css';
+import { useState, useMemo } from "react";
+import { useEtapasData } from "./hooks/useEtapasData";
+import { useMondayContext } from "./hooks/useMondayContext";
+import { useMondayData } from "./hooks/useMondayData";
+import { useEvolucaoData, PeriodoChave } from "./hooks/useEvolucaoData";
+import { useEvolucaoMesData } from "./hooks/useEvolucaoMesData";
+import CardEtapa from "./components/CardEtapa";
+import GraficoEvolucao from "./components/GraficoEvolucao";
+import GraficoEvolucaoMes from "./components/GraficoEvolucaoMes";
+import "./App.css";
 
 function App() {
   const { boardId } = useMondayContext();
   const { items, isLoading } = useMondayData(boardId);
 
-  const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string | undefined>();
-  const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
-  const [abaAtiva, setAbaAtiva] = useState<string>('Evolução Mês Atual');
+  const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string>();
+  const [vendedorGrafico, setVendedorGrafico] = useState<string>();
+  const [abaAtiva, setAbaAtiva] = useState<string>("Evolução Mês Atual");
 
-  // Estado do ponto selecionado no gráfico (periodo + items)
+  // Estado do ponto selecionado
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
 
-  // filtro por etapa na lista exibida (valor de select .etapa-filtro)
-  const [etapaFiltro, setEtapaFiltro] = useState<string>('Todas');
+  // ⭐ Estado do filtro por etapa dentro do popup
+  const [filtroEtapa, setFiltroEtapa] = useState<string>("");
 
   const cores = [
     "#2563eb",
@@ -33,38 +33,23 @@ function App() {
     "#64748b",
   ];
 
-  // vendedores únicos
-  const vendedoresUnicos = Array.from(
-    new Set((items || []).map((i: any) => i.vendedor).filter(Boolean))
-  ).sort((a: string, b: string) => a.localeCompare(b));
+  // 🔥 Arrumando tipagem: forçamos string[]
+  const vendedoresUnicos: string[] = Array.from(
+    new Set(items.map((i) => i.vendedor).filter(Boolean) as string[])
+  ).sort();
 
   const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
-    return vendedorGrafico ? items.filter((i: any) => i.vendedor === vendedorGrafico) : items;
+    return vendedorGrafico
+      ? items.filter((i) => i.vendedor === vendedorGrafico)
+      : items;
   }, [items, vendedorGrafico]);
 
-  // dadosGrafico pode ter tipagem diferente — usamos as guardas em runtime
-  const dadosGrafico: any[] = useEvolucaoData(itensFiltrados) as any[] || [];
+  const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
 
-  // lista de etapas (para popular o select de filtro por etapa)
-  const etapasDisponiveis = useMemo(() => {
-    return Array.from(new Set(dadosGrafico.map(d => String(d?.etapa || '')).filter(Boolean)));
-  }, [dadosGrafico]);
-
-  // util: converte período string para chave usada no objeto items (map criado localmente)
-  const periodoToKeyMap: Record<string, PeriodoChave> = {
-    "7 dias": "dias7",
-    "14 dias": "dias14",
-    "21 dias": "dias21",
-    "30 dias": "dias30",
-    "60 dias": "dias60",
-    "90 dias": "dias90",
-  };
-
-  // RENDER HELPERS
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
     const d = new Date(iso);
@@ -80,12 +65,29 @@ function App() {
     });
   }
 
+  // 🔥 Etapas únicas tipadas corretamente
+  const etapasUnicas: string[] = pontoSelecionado
+    ? Array.from(
+        new Set(
+          (pontoSelecionado.items ?? [])
+            .map((i: any) => i.etapa)
+            .filter(Boolean) as string[]
+        )
+      ).sort()
+    : [];
+
+  // 🔥 Filtra a tabela quando um filtro de etapa é escolhido
+  const itensFiltradosPorEtapa = pontoSelecionado
+    ? pontoSelecionado.items.filter((i: any) =>
+        filtroEtapa ? i.etapa === filtroEtapa : true
+      )
+    : [];
+
   return (
     <div className="main flex flex-col items-center w-full h-full overflow-auto bg-white">
       <h1 className="text-5xl font-bold underline p-4">Dashboard CRM</h1>
 
       <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center m-4">
-
         {/* VISÃO GERAL */}
         <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
           <div className="filtro flex justify-between items-center">
@@ -95,12 +97,14 @@ function App() {
               <span className="mr-3">Filtrar por vendedor:</span>
               <select
                 className="border p-2 rounded bg-white"
-                value={vendedorVisaoGeral || ''}
-                onChange={(e) => setVendedorVisaoGeral(e.target.value || undefined)}
+                value={vendedorVisaoGeral || ""}
+                onChange={(e) =>
+                  setVendedorVisaoGeral(e.target.value || undefined)
+                }
               >
                 <option value="">Todos os vendedores</option>
-                {vendedoresUnicos.map((v: string) => (
-                  <option key={v} value={v}>{v}</option>
+                {vendedoresUnicos.map((v) => (
+                  <option key={v}>{v}</option>
                 ))}
               </select>
             </div>
@@ -110,7 +114,7 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {visaoGeralFiltro.map((etapa: any, index: number) => (
+              {visaoGeralFiltro.map((etapa, index) => (
                 <CardEtapa
                   key={etapa.title}
                   title={etapa.title}
@@ -124,24 +128,24 @@ function App() {
 
         {/* GRÁFICO COM ABAS */}
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
-
           <div className="flex border-b border-gray-300">
-            {["Evolução Mês Atual", "Evolução 90 dias"].map((aba, i) => (
+            {["Evolução Mês Atual", "Evolução 90 dias"].map((aba) => (
               <button
-                key={i}
+                key={aba}
                 onClick={() => setAbaAtiva(aba)}
-                className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
-                  ? "border-b-4 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-                  }`}
+                className={`px-6 py-3 font-semibold transition-colors duration-200 ${
+                  abaAtiva === aba
+                    ? "border-b-4 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
                 {aba}
               </button>
             ))}
           </div>
 
-          {/* Conteúdo das abas */}
           <div className="p-4">
+            {/* ===================== EVOLUÇÃO 90 DIAS ======================= */}
             {abaAtiva === "Evolução 90 dias" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
@@ -152,11 +156,13 @@ function App() {
                     <select
                       className="border p-2 rounded bg-white"
                       value={vendedorGrafico || ""}
-                      onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
+                      onChange={(e) =>
+                        setVendedorGrafico(e.target.value || undefined)
+                      }
                     >
                       <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v: string) => (
-                        <option key={v} value={v}>{v}</option>
+                      {vendedoresUnicos.map((v) => (
+                        <option key={v}>{v}</option>
                       ))}
                     </select>
                   </div>
@@ -165,109 +171,95 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucao
                     dados={dadosGrafico}
-                    onPontoClick={(p: any) => {
-                      // p.periodo vem como "7 dias", "14 dias", etc.
-                      const chave = periodoToKeyMap[String(p?.periodo)] as PeriodoChave | undefined;
-                      if (!chave) {
-                        // defesa: se veio algo inesperado, limpa seleção
-                        setPontoSelecionado(null);
-                        return;
-                      }
+                    onPontoClick={(p) => {
+                      const mapaPeriodos: Record<string, PeriodoChave> = {
+                        "7 dias": "dias7",
+                        "14 dias": "dias14",
+                        "21 dias": "dias21",
+                        "30 dias": "dias30",
+                        "60 dias": "dias60",
+                        "90 dias": "dias90",
+                      };
 
-                      // compõe lista de todos os itens daquele período (todas as etapas)
-                      const todosItens = dadosGrafico.flatMap((et: any) => {
-                        // et.items pode não existir; protegemos
-                        if (!et || !et.items) return [];
-                        const arr = et.items[chave];
-                        return Array.isArray(arr) ? arr : [];
+                      const chave = mapaPeriodos[p.periodo];
+                      if (!chave) return;
+
+                      const itens = dadosGrafico.flatMap((etapa) => {
+                        return etapa.items[chave] ?? [];
                       });
 
-                      // ordena por etapa (string) para ficar agrupado na UI
-                      const ordenado = [...todosItens].sort((a: any, b: any) => {
-                        const ea = String(a?.etapa ?? '');
-                        const eb = String(b?.etapa ?? '');
-                        return ea.localeCompare(eb);
-                      });
+                      setFiltroEtapa("");
 
-                      setEtapaFiltro('Todas'); // reset filtro por etapa ao abrir
                       setPontoSelecionado({
-                        periodo: p.periodo,
-                        items: ordenado,
+                        ...p,
+                        items: [...itens].sort((a, b) =>
+                          a.etapa.localeCompare(b.etapa)
+                        ),
                       });
                     }}
                   />
                 </div>
 
-                {/* ⭐ ÁREA QUE EXIBE OS ITENS DO PONTO CLICADO */}
+                {/* ITENS DO PONTO CLICADO */}
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className="font-bold text-lg mb-3">
+                    <div className="flex items-center gap-4 mb-4">
+                      <h3 className="font-bold text-lg">
                         {pontoSelecionado.periodo}
                       </h3>
 
-                      {/* Select de filtro por etapa */}
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm">Filtrar etapa:</label>
-                        <select
-                          className="etapa-filtro border p-2 rounded bg-white"
-                          value={etapaFiltro}
-                          onChange={(e) => setEtapaFiltro(e.target.value)}
-                        >
-                          <option value="Todas">Todas</option>
-                          {etapasDisponiveis.map((et: any) => (
-                            <option key={et} value={et}>{et}</option>
-                          ))}
-                        </select>
-                      </div>
+                      <select
+                        className="etapa-filtro border p-2 rounded bg-white"
+                        value={filtroEtapa}
+                        onChange={(e) => setFiltroEtapa(e.target.value)}
+                      >
+                        <option value="">Todas as etapas</option>
+                        {etapasUnicas.map((etapa) => (
+                          <option key={etapa}>{etapa}</option>
+                        ))}
+                      </select>
                     </div>
 
-                    {/* aplica filtro por etapa se escolhido */}
-                    {(!Array.isArray(pontoSelecionado.items) || pontoSelecionado.items.length === 0) ? (
-                      <p className="text-gray-500">Nenhum item neste período.</p>
+                    {!itensFiltradosPorEtapa.length ? (
+                      <p className="text-gray-500">
+                        Nenhum item neste período.
+                      </p>
                     ) : (
-                      (() => {
-                        const listaFiltrada = etapaFiltro === 'Todas'
-                          ? pontoSelecionado.items
-                          : pontoSelecionado.items.filter((it: any) => String(it?.etapa || '') === etapaFiltro);
-
-                        if (!listaFiltrada.length) {
-                          return <p className="text-gray-500">Nenhum item após filtro.</p>;
-                        }
-
-                        return (
-                          <table className="w-full border-collapse">
-                            <thead>
-                              <tr className="border-b bg-gray-100">
-                                <th className="p-2 text-left">Nome</th>
-                                <th className="p-2 text-left">Fechamento</th>
-                                <th className="p-2 text-left">Valor</th>
-                                <th className="p-2 text-left">Etapa</th>
-                                <th className="p-2 text-left">Vendedor</th>
-                                <th className="p-2 text-left">Performance</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {listaFiltrada.map((item: any) => (
-                                <tr key={item.id ?? `${item.name}_${Math.random()}`} className="border-b">
-                                  <td className="p-2">{item.name}</td>
-                                  <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
-                                  <td className="p-2">{formatarDinheiro(item?.valor_contrato)}</td>
-                                  <td className="p-2">{item?.etapa}</td>
-                                  <td className="p-2">{item?.vendedor}</td>
-                                  <td className="p-2">{item?.performance ?? ''}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        );
-                      })()
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b bg-gray-100">
+                            <th className="p-2 text-left">Nome</th>
+                            <th className="p-2 text-left">Fechamento</th>
+                            <th className="p-2 text-left">Valor</th>
+                            <th className="p-2 text-left">Etapa</th>
+                            <th className="p-2 text-left">Vendedor</th>
+                            <th className="p-2 text-left">Performance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensFiltradosPorEtapa.map((item: any) => (
+                            <tr key={item.id} className="border-b">
+                              <td className="p-2">{item.name}</td>
+                              <td className="p-2">
+                                {formatarData(item?.fechamento_vendas)}
+                              </td>
+                              <td className="p-2">
+                                {formatarDinheiro(item.valor_contrato)}
+                              </td>
+                              <td className="p-2">{item.etapa}</td>
+                              <td className="p-2">{item.vendedor}</td>
+                              <td className="p-2">{item.performance}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     )}
                   </div>
                 )}
               </>
             )}
 
+            {/* ====================== MÊS ATUAL =========================== */}
             {abaAtiva === "Evolução Mês Atual" && (
               <>
                 <div className="dashboard-filtro flex justify-between items-center p-4">
@@ -278,11 +270,13 @@ function App() {
                     <select
                       className="border p-2 rounded bg-white"
                       value={vendedorGrafico || ""}
-                      onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
+                      onChange={(e) =>
+                        setVendedorGrafico(e.target.value || undefined)
+                      }
                     >
                       <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v: string) => (
-                        <option key={v} value={v}>{v}</option>
+                      {vendedoresUnicos.map((v) => (
+                        <option key={v}>{v}</option>
                       ))}
                     </select>
                   </div>
@@ -293,10 +287,8 @@ function App() {
                 </div>
               </>
             )}
-
           </div>
         </div>
-
       </div>
     </div>
   );
