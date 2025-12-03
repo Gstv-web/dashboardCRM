@@ -17,8 +17,11 @@ function App() {
   const [vendedorGrafico, setVendedorGrafico] = useState<string | undefined>();
   const [abaAtiva, setAbaAtiva] = useState<string>('Evolução Mês Atual');
 
-  // ⭐ ADIÇÃO — Estado do ponto selecionado no gráfico
+  // Estado do ponto selecionado no gráfico (periodo + items)
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
+
+  // filtro por etapa na lista exibida (valor de select .etapa-filtro)
+  const [etapaFiltro, setEtapaFiltro] = useState<string>('Todas');
 
   const cores = [
     "#2563eb",
@@ -30,22 +33,38 @@ function App() {
     "#64748b",
   ];
 
+  // vendedores únicos
   const vendedoresUnicos = Array.from(
-    new Set(items.map((i) => i.vendedor).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b));
+    new Set((items || []).map((i: any) => i.vendedor).filter(Boolean))
+  ).sort((a: string, b: string) => a.localeCompare(b));
 
   const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
-    return vendedorGrafico ? items.filter((i) => i.vendedor === vendedorGrafico) : items;
+    return vendedorGrafico ? items.filter((i: any) => i.vendedor === vendedorGrafico) : items;
   }, [items, vendedorGrafico]);
 
-  const dadosGrafico = useEvolucaoData(itensFiltrados);
-  console.log("dadosGrafico no render:", dadosGrafico);
+  // dadosGrafico pode ter tipagem diferente — usamos as guardas em runtime
+  const dadosGrafico: any[] = useEvolucaoData(itensFiltrados) as any[] || [];
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
 
-  // FUNÇÕES RENDER
+  // lista de etapas (para popular o select de filtro por etapa)
+  const etapasDisponiveis = useMemo(() => {
+    return Array.from(new Set(dadosGrafico.map(d => String(d?.etapa || '')).filter(Boolean)));
+  }, [dadosGrafico]);
+
+  // util: converte período string para chave usada no objeto items (map criado localmente)
+  const periodoToKeyMap: Record<string, PeriodoChave> = {
+    "7 dias": "dias7",
+    "14 dias": "dias14",
+    "21 dias": "dias21",
+    "30 dias": "dias30",
+    "60 dias": "dias60",
+    "90 dias": "dias90",
+  };
+
+  // RENDER HELPERS
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
     const d = new Date(iso);
@@ -60,7 +79,6 @@ function App() {
       currency: "BRL",
     });
   }
-
 
   return (
     <div className="main flex flex-col items-center w-full h-full overflow-auto bg-white">
@@ -81,7 +99,7 @@ function App() {
                 onChange={(e) => setVendedorVisaoGeral(e.target.value || undefined)}
               >
                 <option value="">Todos os vendedores</option>
-                {vendedoresUnicos.map((v) => (
+                {vendedoresUnicos.map((v: string) => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
@@ -92,7 +110,7 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {visaoGeralFiltro.map((etapa, index) => (
+              {visaoGeralFiltro.map((etapa: any, index: number) => (
                 <CardEtapa
                   key={etapa.title}
                   title={etapa.title}
@@ -137,7 +155,7 @@ function App() {
                       onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
                     >
                       <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v) => (
+                      {vendedoresUnicos.map((v: string) => (
                         <option key={v} value={v}>{v}</option>
                       ))}
                     </select>
@@ -147,31 +165,35 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucao
                     dados={dadosGrafico}
-                    onPontoClick={(p) => {
-                      const mapaPeriodos: Record<string, PeriodoChave> = {
-                        "7 dias": "dias7",
-                        "14 dias": "dias14",
-                        "21 dias": "dias21",
-                        "30 dias": "dias30",
-                        "60 dias": "dias60",
-                        "90 dias": "dias90",
-                      };
-                      const chave = mapaPeriodos[p.periodo];
+                    onPontoClick={(p: any) => {
+                      // p.periodo vem como "7 dias", "14 dias", etc.
+                      const chave = periodoToKeyMap[String(p?.periodo)] as PeriodoChave | undefined;
                       if (!chave) {
-                        console.warn("❌ Período sem chave correspondente:", p.periodo);
+                        // defesa: se veio algo inesperado, limpa seleção
+                        setPontoSelecionado(null);
                         return;
                       }
-                      const todosItens = dadosGrafico.flatMap((etapa => {
-                        return etapa.items[chave] ?? [];
-                      }))
-                      setPontoSelecionado({
-                        ...p,
-                        items: [...todosItens].sort((a, b) => a.etapa.localeCompare(b.etapa)),
+
+                      // compõe lista de todos os itens daquele período (todas as etapas)
+                      const todosItens = dadosGrafico.flatMap((et: any) => {
+                        // et.items pode não existir; protegemos
+                        if (!et || !et.items) return [];
+                        const arr = et.items[chave];
+                        return Array.isArray(arr) ? arr : [];
                       });
-                      console.log("itens ponto selecionado", pontoSelecionado);
-                      // dadosGrafico.forEach((et, i) => {
-                      //   console.log(`Etapa ${et.etapa} → keys`, Object.keys(et.items));
-                      // });
+
+                      // ordena por etapa (string) para ficar agrupado na UI
+                      const ordenado = [...todosItens].sort((a: any, b: any) => {
+                        const ea = String(a?.etapa ?? '');
+                        const eb = String(b?.etapa ?? '');
+                        return ea.localeCompare(eb);
+                      });
+
+                      setEtapaFiltro('Todas'); // reset filtro por etapa ao abrir
+                      setPontoSelecionado({
+                        periodo: p.periodo,
+                        items: ordenado,
+                      });
                     }}
                   />
                 </div>
@@ -179,39 +201,67 @@ function App() {
                 {/* ⭐ ÁREA QUE EXIBE OS ITENS DO PONTO CLICADO */}
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
-                    <div className="flex">
+                    <div className="flex items-center justify-between gap-4">
                       <h3 className="font-bold text-lg mb-3">
                         {pontoSelecionado.periodo}
                       </h3>
-                      <select className="">select vem aqui</select>
+
+                      {/* Select de filtro por etapa */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm">Filtrar etapa:</label>
+                        <select
+                          className="etapa-filtro border p-2 rounded bg-white"
+                          value={etapaFiltro}
+                          onChange={(e) => setEtapaFiltro(e.target.value)}
+                        >
+                          <option value="Todas">Todas</option>
+                          {etapasDisponiveis.map((et: any) => (
+                            <option key={et} value={et}>{et}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
 
-                    {!pontoSelecionado.items?.length ? (
+                    {/* aplica filtro por etapa se escolhido */}
+                    {(!Array.isArray(pontoSelecionado.items) || pontoSelecionado.items.length === 0) ? (
                       <p className="text-gray-500">Nenhum item neste período.</p>
                     ) : (
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b bg-gray-100">
-                            <th className="p-2 text-left">Nome</th>
-                            <th className="p-2 text-left">Fechamento</th>
-                            <th className="p-2 text-left">Valor</th>
-                            <th className="p-2 text-left">Vendedor</th>
-                            <th className="p-2 text-left">Performance</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {pontoSelecionado.items.map((item: any) => (
-                            <tr key={item.id} className="border-b">
-                              <td className="p-2">{item.name}</td>
-                              <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
-                              <td className="p-2">R$ {formatarDinheiro(item.valor_contrato)}</td>
-                              <td className="p-2">{item.etapa}</td>
-                              <td className="p-2">{item.vendedor}</td>
-                              <td className="p-2">{item.performance}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      (() => {
+                        const listaFiltrada = etapaFiltro === 'Todas'
+                          ? pontoSelecionado.items
+                          : pontoSelecionado.items.filter((it: any) => String(it?.etapa || '') === etapaFiltro);
+
+                        if (!listaFiltrada.length) {
+                          return <p className="text-gray-500">Nenhum item após filtro.</p>;
+                        }
+
+                        return (
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="border-b bg-gray-100">
+                                <th className="p-2 text-left">Nome</th>
+                                <th className="p-2 text-left">Fechamento</th>
+                                <th className="p-2 text-left">Valor</th>
+                                <th className="p-2 text-left">Etapa</th>
+                                <th className="p-2 text-left">Vendedor</th>
+                                <th className="p-2 text-left">Performance</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {listaFiltrada.map((item: any) => (
+                                <tr key={item.id ?? `${item.name}_${Math.random()}`} className="border-b">
+                                  <td className="p-2">{item.name}</td>
+                                  <td className="p-2">{formatarData(item?.fechamento_vendas)}</td>
+                                  <td className="p-2">{formatarDinheiro(item?.valor_contrato)}</td>
+                                  <td className="p-2">{item?.etapa}</td>
+                                  <td className="p-2">{item?.vendedor}</td>
+                                  <td className="p-2">{item?.performance ?? ''}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        );
+                      })()
                     )}
                   </div>
                 )}
@@ -231,7 +281,7 @@ function App() {
                       onChange={(e) => setVendedorGrafico(e.target.value || undefined)}
                     >
                       <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v) => (
+                      {vendedoresUnicos.map((v: string) => (
                         <option key={v} value={v}>{v}</option>
                       ))}
                     </select>
