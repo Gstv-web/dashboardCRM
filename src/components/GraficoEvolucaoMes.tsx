@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,9 +12,11 @@ import {
 
 interface Props {
   dados: any[];
+  onPontoClcick?: (ponto: any) => void;
 }
 
-export default function GraficoEvolucaoMes({ dados }: Props) {
+export default function GraficoEvolucaoMes({ dados, onPontoClcick }: Props) {
+  const [linhaHover, setLinhaHover] = useState<string | null>(null);
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
@@ -29,6 +32,7 @@ export default function GraficoEvolucaoMes({ dados }: Props) {
   ];
 
   const etapas = Object.keys(dados[0]).filter((k) => k !== "dia");
+  console.log("const etapas em GraficoEvolucaoMes:", etapas)
 
   return (
     <div className="w-full h-[400px]">

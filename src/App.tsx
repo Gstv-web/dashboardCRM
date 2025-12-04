@@ -283,7 +283,10 @@ function App() {
                 </div>
 
                 <div className="dashboard-grafico m-2 p-2">
-                  <GraficoEvolucaoMes dados={dadosGraficoMes} />
+                  <GraficoEvolucaoMes 
+                    dados={dadosGraficoMes}
+                    onPontoClcick={(p) => console.log("asdadsd")}
+                  />
                 </div>
               </>
             )}
