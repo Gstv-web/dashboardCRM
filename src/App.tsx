@@ -209,7 +209,7 @@ function App() {
                       </h3>
 
                       <select
-                        className="etapa-filtro border p-2 rounded bg-white justify-self-end"
+                        className="etapa-filtro border p-2 rounded bg-white ml-auto"
                         value={filtroEtapa}
                         onChange={(e) => setFiltroEtapa(e.target.value)}
                       >
