@@ -203,13 +203,13 @@ function App() {
                 {/* ITENS DO PONTO CLICADO */}
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
-                    <div className="flex items-center justify-around gap-4 mb-4">
+                    <div className="flex items-center gap-4 mb-4">
                       <h3 className="font-bold text-lg">
                         {pontoSelecionado.periodo}
                       </h3>
 
                       <select
-                        className="etapa-filtro border p-2 rounded bg-white"
+                        className="etapa-filtro border p-2 rounded bg-white justify-self-end"
                         value={filtroEtapa}
                         onChange={(e) => setFiltroEtapa(e.target.value)}
                       >
