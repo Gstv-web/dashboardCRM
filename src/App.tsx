@@ -49,6 +49,7 @@ function App() {
 
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
+  console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
@@ -285,7 +286,7 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucaoMes 
                     dados={dadosGraficoMes}
-                    onPontoClcick={(p) => console.log("asdadsd")}
+                    onPontoClick={(p) => console.log("asdadsd")}
                   />
                 </div>
               </>

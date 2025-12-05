@@ -12,10 +12,10 @@ import {
 
 interface Props {
   dados: any[];
-  onPontoClcick?: (ponto: any) => void;
+  onPontoClick?: (ponto: any) => void;
 }
 
-export default function GraficoEvolucaoMes({ dados, onPontoClcick }: Props) {
+export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
   const [linhaHover, setLinhaHover] = useState<string | null>(null);
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
