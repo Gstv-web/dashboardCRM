@@ -50,6 +50,7 @@ function App() {
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
   console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
+  console.log("dados de useEvolucaoData em App.tsx:", dadosGrafico);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
