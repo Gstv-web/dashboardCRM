@@ -16,8 +16,9 @@ export interface Item {
 }
 
 export interface EvolucaoEtapaDia {
-  dia: string; // agora "05/02"
-  [etapa: string]: number | string;
+  dia: string; // "05/02"
+  itens: Item[]; // 🔥 AGORA cada dia guarda os itens do dia
+  [etapa: string]: number | string | Item[];
 }
 
 function parseToDate(valor: any): Date | null {
@@ -40,7 +41,6 @@ export function useEvolucaoMesData(
 
     const diasNoMes = new Date(ano, mes + 1, 0).getDate();
 
-    // etapas mapeadas
     const etapasMap = {
       "Prospect - 25%": "prospect",
       "Oportunidade - 50%": "oportunidade",
@@ -50,24 +50,50 @@ export function useEvolucaoMesData(
       "Encerrado/Negado": "encerrado",
       "Stand-by": "standby",
     } as const;
+
     console.log("itens em useEvolucaoMesData:", items);
-    // 🎯 1 — cria estrutura inicial
-    const grafico: EvolucaoEtapaDia[] = [];
+
     const itensPorDia: Record<string, Item[]> = {};
+
+    const grafico: EvolucaoEtapaDia[] = [];
+
+    // 🎯 1 — Inicializa dias + coleta itens do dia
     for (let dia = 1; dia <= diasNoMes; dia++) {
       const dd = String(dia).padStart(2, "0");
       const mm = String(mes + 1).padStart(2, "0");
+
+      const chaveDia = `${dd}/${mm}`;
+      itensPorDia[chaveDia] = [];
+
+      // ⬇ IMPLEMENTAÇÃO DO COMENTÁRIO
       for (const obj of items) {
-        console.log("obj", obj)
+        for (const etapaCampo of Object.values(etapasMap)) {
+          const dataBruta = obj.datas?.[etapaCampo];
+          const dataEtapa = parseToDate(dataBruta);
+
+          if (!dataEtapa) continue;
+
+          const mesmoDia =
+            dataEtapa.getDate() === dia &&
+            dataEtapa.getMonth() === mes &&
+            dataEtapa.getFullYear() === ano;
+
+          if (mesmoDia) {
+            itensPorDia[chaveDia].push(obj);
+            break; // já adicionou, não precisa verificar outras etapas
+          }
+        }
       }
 
+      // ⬇ PUSH no gráfico já incluindo itens do dia
       grafico.push({
-        dia: `${dd}/${mm}`, // 🔥 AGORA dd/mm
+        dia: chaveDia,
+        itens: itensPorDia[chaveDia],
         ...Object.fromEntries(Object.keys(etapasMap).map((e) => [e, 0])),
       });
     }
 
-    // 🎯 2 — conta diariamente
+    // 🎯 2 — Soma quantitativos por etapa no gráfico
     for (const item of items) {
       if (vendedorSelecionado && item.vendedor !== vendedorSelecionado) continue;
 
@@ -81,9 +107,12 @@ export function useEvolucaoMesData(
       const dia = dataEtapa.getDate();
 
       if (dataEtapa.getMonth() === mes && dataEtapa.getFullYear() === ano) {
-        grafico[dia - 1][etapaNome] = (grafico[dia - 1][etapaNome] as number) + 1;
+        grafico[dia - 1][etapaNome] =
+          (grafico[dia - 1][etapaNome] as number) + 1;
       }
     }
+
+    console.log("itensPorDia:", itensPorDia);
     console.log("dados useEvolucaoMesData:", grafico);
 
     return grafico;
