@@ -50,7 +50,7 @@ export function useEvolucaoMesData(
       "Encerrado/Negado": "encerrado",
       "Stand-by": "standby",
     } as const;
-
+    console.log("itens em useEvolucaoMesData:", items);
     // 🎯 1 — cria estrutura inicial
     const grafico: EvolucaoEtapaDia[] = [];
 
