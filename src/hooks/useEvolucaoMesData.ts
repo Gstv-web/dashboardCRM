@@ -81,6 +81,7 @@ export function useEvolucaoMesData(
         grafico[dia - 1][etapaNome] = (grafico[dia - 1][etapaNome] as number) + 1;
       }
     }
+    console.log("dados useEvolucaoMesData:", grafico);
 
     return grafico;
   }, [items, vendedorSelecionado]);
