@@ -15,14 +15,36 @@ export interface Item {
   >;
 }
 
-export interface EvolucaoEtapaDia {
-  dia: string; // agora "05/02"
-  [etapa: string]: number | string;
-}
+// mapa no escopo do módulo (reutilizável)
+const etapasMap = {
+  "Prospect - 25%": "prospect",
+  "Oportunidade - 50%": "oportunidade",
+  "Forecast - 75%": "forecast",
+  "Contrato Firmado - 100%": "contrato",
+  "Ação Pontual Firmada - 100%": "acaopontual",
+  "Encerrado/Negado": "encerrado",
+  "Stand-by": "standby",
+} as const;
 
+// tipos derivados
+type DisplayEtapa = keyof typeof etapasMap; // ex: "Prospect - 25%"
+type InternalEtapa = typeof etapasMap[DisplayEtapa]; // ex: "prospect"
+
+// tipo da linha do gráfico:
+// - dia: string
+// - cada DisplayEtapa tem um number
+// - cada InternalEtapa tem um array de Item sob a chave `${internal}_objs`
+type EvolucaoEtapaDiaFull = {
+  dia: string;
+} & {
+  [K in DisplayEtapa]: number;
+} & {
+  [K in InternalEtapa as `${K}_objs`]: Item[];
+};
+
+// função de parse (mantive sua original)
 function parseToDate(valor: any): Date | null {
   if (!valor) return null;
-
   const d = new Date(valor);
   return isNaN(d.getTime()) ? null : d;
 }
@@ -30,58 +52,65 @@ function parseToDate(valor: any): Date | null {
 export function useEvolucaoMesData(
   items: Item[],
   vendedorSelecionado?: string
-): EvolucaoEtapaDia[] {
-  return useMemo<EvolucaoEtapaDia[]>(() => {
+): EvolucaoEtapaDiaFull[] {
+  return useMemo<EvolucaoEtapaDiaFull[]>(() => {
     if (!Array.isArray(items) || items.length === 0) return [];
 
     const now = new Date();
     const ano = now.getFullYear();
     const mes = now.getMonth();
-
     const diasNoMes = new Date(ano, mes + 1, 0).getDate();
 
-    // etapas mapeadas
-    const etapasMap = {
-      "Prospect - 25%": "prospect",
-      "Oportunidade - 50%": "oportunidade",
-      "Forecast - 75%": "forecast",
-      "Contrato Firmado - 100%": "contrato",
-      "Ação Pontual Firmada - 100%": "acaopontual",
-      "Encerrado/Negado": "encerrado",
-      "Stand-by": "standby",
-    } as const;
+    // garantimos o tipo certo das keys aqui
+    const displayKeys = Object.keys(etapasMap) as DisplayEtapa[];
 
-    // 🎯 1 — cria estrutura inicial
-    const grafico: EvolucaoEtapaDia[] = [];
+    // inicializa grafico com tipagem forte
+    const grafico: EvolucaoEtapaDiaFull[] = [];
 
     for (let dia = 1; dia <= diasNoMes; dia++) {
       const dd = String(dia).padStart(2, "0");
       const mm = String(mes + 1).padStart(2, "0");
+      const diaStr = `${dd}/${mm}`;
 
-      grafico.push({
-        dia: `${dd}/${mm}`, // 🔥 AGORA dd/mm
-        ...Object.fromEntries(Object.keys(etapasMap).map((e) => [e, 0])),
-      });
+      // build de forma segura: cria um objeto com dia, contadores e arrays
+      const base = displayKeys.reduce<Record<string, any>>((acc, display) => {
+        const internal = etapasMap[display]; // tipo InternalEtapa
+        acc[display] = 0;
+        acc[`${internal}_objs`] = [];
+        return acc;
+      }, { dia: diaStr });
+
+      // caste para o tipo final (seguro porque construímos as chaves explicitamente)
+      grafico.push(base as EvolucaoEtapaDiaFull);
     }
 
-    // 🎯 2 — conta diariamente
+    // popula contagens e arrays
     for (const item of items) {
       if (vendedorSelecionado && item.vendedor !== vendedorSelecionado) continue;
 
-      const etapaNome = item.etapa;
-      const campo = etapasMap[etapaNome as keyof typeof etapasMap];
-      if (!campo) continue;
+      const etapaNome = item.etapa as DisplayEtapa; // assumimos que bate com uma das displays
+      // se etapaNome não está entre as displays, ignore
+      if (!displayKeys.includes(etapaNome)) continue;
 
-      const dataEtapa = parseToDate(item.datas?.[campo]);
+      const campoInterno = etapasMap[etapaNome]; // InternalEtapa
+      if (!campoInterno) continue;
+
+      const dataEtapa = parseToDate(item.datas?.[campoInterno]);
       if (!dataEtapa) continue;
 
-      const dia = dataEtapa.getDate();
+      if (dataEtapa.getMonth() !== mes || dataEtapa.getFullYear() !== ano) continue;
 
-      if (dataEtapa.getMonth() === mes && dataEtapa.getFullYear() === ano) {
-        grafico[dia - 1][etapaNome] = (grafico[dia - 1][etapaNome] as number) + 1;
-      }
+      const diaNum = dataEtapa.getDate();
+      if (diaNum < 1 || diaNum > diasNoMes) continue;
+
+      const linha = grafico[diaNum - 1];
+
+      // incrementa contador (garantido que existe)
+      linha[etapaNome] = (linha[etapaNome] as number) + 1;
+
+      // adiciona o item no array correspondente (chave `${internal}_objs`)
+      (linha[`${campoInterno}_objs`] as Item[]).push(item);
     }
-    console.log("dados useEvolucaoMesData:", grafico);
 
     return grafico;
   }, [items, vendedorSelecionado]);
