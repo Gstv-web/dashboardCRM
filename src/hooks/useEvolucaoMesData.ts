@@ -58,7 +58,7 @@ export function useEvolucaoMesData(
       const dd = String(dia).padStart(2, "0");
       const mm = String(mes + 1).padStart(2, "0");
       for (const data of Object.values(etapasMap)) {
-        console.log("data em useEvolucaoMesData:", data);
+        console.log("data em useEvolucaoMesData:", itensPorDia);
       }
 
       grafico.push({
