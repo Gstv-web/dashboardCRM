@@ -287,7 +287,7 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucaoMes 
                     dados={dadosGraficoMes}
-                    onPontoClick={(p) => console.log("asdadsd")}
+                    onPontoClick={(p) => console.log(dadosGraficoMes)}
                   />
                 </div>
               </>
