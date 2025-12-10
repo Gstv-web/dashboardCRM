@@ -31,7 +31,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
     "#64748b",
   ];
 
-  const etapas = Object.keys(dados[0]).filter((k) => k !== "dia");
+  const etapas = Object.keys(dados[0]).filter((k) => k !== "dia" && k !== "itens");
   // console.log("const etapas em GraficoEvolucaoMes:", etapas)
 
   return (
