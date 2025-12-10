@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   LineChart,
+  Dot,
   Line,
   XAxis,
   YAxis,
@@ -44,14 +45,21 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
           <Tooltip />
           <Legend />
 
-          {etapas.map((etapa, i) => (
+          {etapas.map((etapas, i) => (
             <Line
-              key={etapa}
+              key={etapas}
               type="monotone"
-              dataKey={etapa}
+              dataKey={etapas}
               stroke={cores[i % cores.length]}
               strokeWidth={2}
-              dot={false}
+              dot={(props) => (
+                <Dot
+                  {...props}
+                  r={3}
+                  onMouseEnter={() => setLinhaHover(etapas)}
+                  onMouseLeave={() => setLinhaHover(null)}
+                />
+              )}
             />
           ))}
         </LineChart>
