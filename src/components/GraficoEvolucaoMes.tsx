@@ -33,7 +33,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
   ];
 
   const etapas = Object.keys(dados[0]).filter((k) => k !== "dia" && k !== "itens");
-  console.log("dados no componente GraficoEvolucaoMes:", dados)
+  // console.log("dados no componente GraficoEvolucaoMes:", dados)
 
   return (
     <div className="w-full h-[400px]">
@@ -66,14 +66,14 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                   r={5}
                   onClick={() => {
                     if (onPontoClick) {
-                      console.log("(click) props no GraficoEvolucaoMes:", props);
+                      // console.log("(click) props no GraficoEvolucaoMes:", props);
                       const ponto = {
                         etapa: etapas,
                         periodo: props.payload.dia,
                         valor: props.value,
                         items: props.payload.itens?.filter((item: any) => item.etapa === etapas) || [],
                       }
-                      console.log("ponto no GraficoEvolucaoMes:", ponto);
+                      onPontoClick(ponto);
                     }
                   }}
                 />
