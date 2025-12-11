@@ -70,6 +70,8 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                       const ponto = {
                         etapa: etapas,
                         periodo: props.payload.dia,
+                        valor: props.payload.itens.valor_contrato?.[etapas] || 0,
+                        items: props.payload.items?.filter((item: any) => item.etapa === etapas) || [],
                       }
                       console.log("ponto no GraficoEvolucaoMes:", ponto);
                     }
