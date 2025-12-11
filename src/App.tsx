@@ -289,6 +289,7 @@ function App() {
                     dados={dadosGraficoMes}
                     onPontoClick={(p) => {
                       const itensDoDia = p.itens || [];
+                      console.log("itens do dia clicado:", itensDoDia);
                       setFiltroEtapa("");
                       setPontoSelecionado({
                         dia: p.dia,
