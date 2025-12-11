@@ -70,7 +70,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                       const ponto = {
                         etapa: etapas[i]
                       }
-                      console.log("ponto no GraficoEvolucaoMes:", ponto);
+                      console.log("ponto no GraficoEvolucaoMes:", ponto.etapa);
                     }
                   }}
                 />
