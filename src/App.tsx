@@ -289,7 +289,7 @@ function App() {
                     dados={dadosGraficoMes}
                     onPontoClick={(p) => {
                       const dia = dadosGraficoMes;
-                      console.log("ponto clicado no GraficoEvolucaoMes:", p);
+                      console.log("ponto clicado no GraficoEvolucaoMes:", dia);
                     }}
                   />
                 </div>
