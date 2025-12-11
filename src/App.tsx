@@ -288,7 +288,7 @@ function App() {
                   <GraficoEvolucaoMes 
                     dados={dadosGraficoMes}
                     onPontoClick={(p) => {
-                      const dia = dadosGraficoMes.map(d => d.dia);
+                      const dia = dadosGraficoMes.map(d => d.dia).length;
                       console.log("ponto clicado no GraficoEvolucaoMes:", dia);
                     }}
                   />
