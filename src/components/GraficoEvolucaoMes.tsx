@@ -45,7 +45,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
           <Tooltip />
           <Legend />
 
-          {etapas.map((etapas, i) => (
+          {dados.map((etapas, i) => (
             <Line
               key={etapas}
               type="monotone"
