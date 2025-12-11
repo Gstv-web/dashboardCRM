@@ -33,7 +33,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
   ];
 
   const etapas = Object.keys(dados[0]).filter((k) => k !== "dia" && k !== "itens");
-  console.log("etapas no componente GraficoEvolucaoMes:", etapas)
+  console.log("dados no componente GraficoEvolucaoMes:", dados)
 
   return (
     <div className="w-full h-[400px]">
@@ -45,7 +45,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
           <Tooltip />
           <Legend />
 
-          {dados.map((etapas, i) => (
+          {etapas.map((etapas, i) => (
             <Line
               key={etapas}
               type="monotone"
