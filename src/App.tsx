@@ -287,7 +287,10 @@ function App() {
                 <div className="dashboard-grafico m-2 p-2">
                   <GraficoEvolucaoMes 
                     dados={dadosGraficoMes}
-                    onPontoClick={(p) => console.log("ponto clicado no gráfico mês atual:", p)}
+                    onPontoClick={(p) => {
+                      const dia = dadosGraficoMes;
+                      console.log("ponto clicado no GraficoEvolucaoMes:", p);
+                    }}
                   />
                 </div>
               </>
