@@ -60,6 +60,12 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                   onMouseLeave={() => setLinhaHover(null)}
                 />
               )}
+              activeDot={(props) => (
+                <Dot
+                  {...props}
+                  r={5}
+                />
+              )}
             />
           ))}
         </LineChart>
