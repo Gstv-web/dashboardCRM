@@ -33,7 +33,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
   ];
 
   const etapas = Object.keys(dados[0]).filter((k) => k !== "dia" && k !== "itens");
-  console.log("dados no componente GraficoEvolucaoMes:", dados)
+  console.log("etapas no componente GraficoEvolucaoMes:", etapas)
 
   return (
     <div className="w-full h-[400px]">
