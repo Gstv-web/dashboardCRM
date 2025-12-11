@@ -68,9 +68,9 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                     if (onPontoClick) {
                       // console.log("(click) props no GraficoEvolucaoMes:", props);
                       const ponto = {
-                        etapa: etapas[i]
+                        etapa: etapas
                       }
-                      console.log("ponto no GraficoEvolucaoMes:", ponto.etapa);
+                      console.log("ponto no GraficoEvolucaoMes:", ponto);
                     }
                   }}
                 />
