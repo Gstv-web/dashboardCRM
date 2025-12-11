@@ -64,6 +64,11 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                 <Dot
                   {...props}
                   r={5}
+                  onClick={() => {
+                    if (onPontoClick) {
+                      console.log("(click) props no GraficoEvolucaoMes:", props);
+                    }
+                  }}
                 />
               )}
             />
