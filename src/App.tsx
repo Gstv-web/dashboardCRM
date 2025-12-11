@@ -288,8 +288,13 @@ function App() {
                   <GraficoEvolucaoMes 
                     dados={dadosGraficoMes}
                     onPontoClick={(p) => {
-                      const dia = dadosGraficoMes.map(d => d.dia).length;
-                      console.log("ponto clicado no GraficoEvolucaoMes:", dia);
+                      const itensDoDia = p.itens || [];
+                      setFiltroEtapa("");
+                      setPontoSelecionado({
+                        dia: p.dia,
+                        items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
+                      });
+                      console.log("Ponto selecionado:", pontoSelecionado)
                     }}
                   />
                 </div>
