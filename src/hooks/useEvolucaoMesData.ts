@@ -10,7 +10,7 @@ export interface Item {
   fechamento_vendas?: string;
   valor_mensal_contrato?: string;
   datas: Record<
-    "prospect" | "oportunidade" | "forecast" | "contrato" | "acaopontual" | "encerrado" | "standby",
+    "prospect" | "oportunidade" | "forecast75" | "forecast90" | "contrato" | "acaopontual" | "encerrado" | "standby",
     string | Date | null | undefined
   >;
 }
@@ -44,7 +44,8 @@ export function useEvolucaoMesData(
     const etapasMap = {
       "Prospect - 25%": "prospect",
       "Oportunidade - 50%": "oportunidade",
-      "Forecast - 75%": "forecast",
+      "Forecast - 75%": "forecast75",
+      "Forecast - 90%": "forecast90",
       "Contrato Firmado - 100%": "contrato",
       "Ação Pontual Firmada - 100%": "acaopontual",
       "Encerrado/Negado": "encerrado",

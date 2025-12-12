@@ -25,6 +25,7 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
     "#2563eb",
     "#f8e800ff",
     "#17d45c",
+    "#464e49ff",
     "#135c25ff",
     "#00a84cff",
     "#dc2626",

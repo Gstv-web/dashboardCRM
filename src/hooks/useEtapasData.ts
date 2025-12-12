@@ -30,6 +30,7 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
       "Prospect - 25%",
       "Oportunidade - 50%",
       "Forecast - 75%",
+      "Forecast - 90%",
       "Contrato Firmado - 100%",
       "Ação Pontual Firmada - 100%",
       "Operação Pró-Bono",
