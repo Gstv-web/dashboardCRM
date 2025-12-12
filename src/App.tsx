@@ -27,6 +27,7 @@ function App() {
     "#2563eb",
     "#d8ca08ff",
     "#17d45c",
+    "#464e49ff",
     "#135c25ff",
     "#00a84cff",
     "#da810cff",
