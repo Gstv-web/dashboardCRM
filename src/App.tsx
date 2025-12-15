@@ -328,13 +328,13 @@ function App() {
                     ) : (
                       <table className="w-full border-collapse">
                         <thead>
-                          <tr className="border-b bg-gray-100 flex">
-                            <th className="p-2 text-left">Nome</th>
-                            <th className="p-2 text-left">Fechamento</th>
-                            <th className="p-2 text-left">Valor</th>
-                            <th className="p-2 text-left">Etapa</th>
-                            <th className="p-2 text-left">Vendedor</th>
-                            <th className="p-2 text-left">Performance</th>
+                          <tr className="border-b bg-gray-100">
+                            <th className="p-2 text-center">Nome</th>
+                            <th className="p-2 text-center">Fechamento</th>
+                            <th className="p-2 text-center">Valor</th>
+                            <th className="p-2 text-center">Etapa</th>
+                            <th className="p-2 text-center">Vendedor</th>
+                            <th className="p-2 text-center">Performance</th>
                           </tr>
                         </thead>
                         <tbody>
