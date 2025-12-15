@@ -291,7 +291,7 @@ function App() {
                     onPontoClick={(p) => {
                       // const itensDoDia = p.payload.items || [];
                       // console.log("itens do dia clicado:", itensDoDia);
-                      // console.log("Ponto clicado:", p);
+                      console.log("Ponto clicado (App.tsx):", p);
                       // setFiltroEtapa("");
                       // setPontoSelecionado({
                       //   dia: p.dia,
