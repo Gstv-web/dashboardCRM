@@ -293,6 +293,7 @@ function App() {
                       console.log("Ponto clicado (App.tsx):", p);
                       setFiltroEtapa("");
                       setPontoSelecionado(p);
+                      console.log("Ponto selecionado (useState):", pontoSelecionado);
                       // setPontoSelecionado({
                       //   dia: p.dia,
                       //   items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
