@@ -328,7 +328,7 @@ function App() {
                     ) : (
                       <table className="w-full border-collapse">
                         <thead>
-                          <tr className="border-b bg-gray-100">
+                          <tr className="border-b bg-gray-100 flex">
                             <th className="p-2 text-left">Nome</th>
                             <th className="p-2 text-left">Fechamento</th>
                             <th className="p-2 text-left">Valor</th>
