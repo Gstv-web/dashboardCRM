@@ -296,7 +296,7 @@ function App() {
                       //   dia: p.dia,
                       //   items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
                       // });
-                      console.log("Ponto selecionado:", pontoSelecionado)
+                      // console.log("Ponto selecionado:", pontoSelecionado)
                     }}
                   />
                 </div>
