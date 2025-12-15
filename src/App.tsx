@@ -291,7 +291,8 @@ function App() {
                       // const itensDoDia = p.payload.items || [];
                       // console.log("itens do dia clicado:", itensDoDia);
                       console.log("Ponto clicado (App.tsx):", p);
-                      // setFiltroEtapa("");
+                      setFiltroEtapa("");
+                      setPontoSelecionado(p);
                       // setPontoSelecionado({
                       //   dia: p.dia,
                       //   items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
