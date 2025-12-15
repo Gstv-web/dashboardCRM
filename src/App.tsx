@@ -268,7 +268,7 @@ function App() {
                   <h2 className="font-bold">Evolução no mês atual</h2>
 
                   <div>
-                    <span className="mr-3">Filtrar por vendedor:</span>
+                    <span className="mr-3">Filtrar por etapa:</span>
                     <select
                       className="border p-2 rounded bg-white"
                       value={vendedorGrafico || ""}
