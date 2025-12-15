@@ -71,19 +71,19 @@ function App() {
   // 🔥 Etapas únicas tipadas corretamente
   const etapasUnicas: string[] = pontoSelecionado
     ? Array.from(
-        new Set(
-          (pontoSelecionado.items ?? [])
-            .map((i: any) => i.etapa)
-            .filter(Boolean) as string[]
-        )
-      ).sort()
+      new Set(
+        (pontoSelecionado.items ?? [])
+          .map((i: any) => i.etapa)
+          .filter(Boolean) as string[]
+      )
+    ).sort()
     : [];
 
   // 🔥 Filtra a tabela quando um filtro de etapa é escolhido
   const itensFiltradosPorEtapa = pontoSelecionado
     ? pontoSelecionado.items.filter((i: any) =>
-        filtroEtapa ? i.etapa === filtroEtapa : true
-      )
+      filtroEtapa ? i.etapa === filtroEtapa : true
+    )
     : [];
 
   return (
@@ -136,11 +136,10 @@ function App() {
               <button
                 key={aba}
                 onClick={() => setAbaAtiva(aba)}
-                className={`px-6 py-3 font-semibold transition-colors duration-200 ${
-                  abaAtiva === aba
+                className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
                     ? "border-b-4 border-blue-600 text-blue-600"
                     : "text-gray-500 hover:text-gray-700"
-                }`}
+                  }`}
               >
                 {aba}
               </button>
@@ -286,7 +285,7 @@ function App() {
                 </div>
 
                 <div className="dashboard-grafico m-2 p-2">
-                  <GraficoEvolucaoMes 
+                  <GraficoEvolucaoMes
                     dados={dadosGraficoMes}
                     onPontoClick={(p) => {
                       // const itensDoDia = p.payload.items || [];
@@ -301,6 +300,61 @@ function App() {
                     }}
                   />
                 </div>
+                {pontoSelecionado && (
+                  <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <h3 className="font-bold text-lg">
+                        {pontoSelecionado.periodo}
+                      </h3>
+
+                      <select
+                        className="etapa-filtro border p-2 rounded bg-white ml-auto"
+                        value={filtroEtapa}
+                        onChange={(e) => setFiltroEtapa(e.target.value)}
+                      >
+                        <option value="">Todas as etapas</option>
+                        {etapasUnicas.map((etapa) => (
+                          <option key={etapa}>{etapa}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {!itensFiltradosPorEtapa.length ? (
+                      <p className="text-gray-500">
+                        Nenhum item neste período.
+                      </p>
+                    ) : (
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b bg-gray-100">
+                            <th className="p-2 text-left">Nome</th>
+                            <th className="p-2 text-left">Fechamento</th>
+                            <th className="p-2 text-left">Valor</th>
+                            <th className="p-2 text-left">Etapa</th>
+                            <th className="p-2 text-left">Vendedor</th>
+                            <th className="p-2 text-left">Performance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensFiltradosPorEtapa.map((item: any) => (
+                            <tr key={item.id} className="border-b">
+                              <td className="p-2">{item.name}</td>
+                              <td className="p-2">
+                                {formatarData(item?.fechamento_vendas)}
+                              </td>
+                              <td className="p-2">
+                                {formatarDinheiro(item.valor_contrato)}
+                              </td>
+                              <td className="p-2">{item.etapa}</td>
+                              <td className="p-2">{item.vendedor}</td>
+                              <td className="p-2">{item.performance}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
               </>
             )}
           </div>
