@@ -69,14 +69,14 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                   r={5}
                   onClick={() => {
                     if (onPontoClick) {
-                      // console.log("(click) props no GraficoEvolucaoMes:", props);
+                      console.log("(click) props no GraficoEvolucaoMes:", props);
                       const ponto = {
                         etapa: etapas,
                         periodo: props.payload.dia,
                         valor: props.value,
                         items: props.payload.itens?.[etapas] || [],
                       };
-                      console.log("clicou no ponto (componente):", ponto)
+                      // console.log("clicou no ponto (componente):", ponto)
                       onPontoClick(ponto);
                     }
                   }}
