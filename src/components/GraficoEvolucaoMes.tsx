@@ -76,7 +76,8 @@ export default function GraficoEvolucaoMes({ dados, onPontoClick }: Props) {
                         valor: props.value,
                         items: props.payload.itens?.[etapas] || [],
                       }
-                      onPontoClick(ponto);
+                      console.log(ponto)
+                      // onPontoClick(ponto);
                     }
                   }}
                 />
