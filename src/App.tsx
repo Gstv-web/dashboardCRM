@@ -291,11 +291,11 @@ function App() {
                     onPontoClick={(p) => {
                       const itensDoDia = p.payload.items || [];
                       console.log("itens do dia clicado:", itensDoDia);
-                      setFiltroEtapa("");
-                      setPontoSelecionado({
-                        dia: p.dia,
-                        items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
-                      });
+                      // setFiltroEtapa("");
+                      // setPontoSelecionado({
+                      //   dia: p.dia,
+                      //   items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
+                      // });
                       console.log("Ponto selecionado:", pontoSelecionado)
                     }}
                   />
