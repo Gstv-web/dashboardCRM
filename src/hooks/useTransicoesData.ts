@@ -85,6 +85,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       const pageLimit = 200;
       let page = 1;
       const acumulado: TransicaoRegistro[] = [];
+      let debugCount = 0; // limita logs brutos
 
       while (true) {
         console.log("[useTransicoesData] Buscando página", page);
@@ -126,19 +127,20 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
         console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
-        if (!logs.length) {
-        //   console.log("[useTransicoesData] Fim da paginação (sem logs nesta página)");
-          break;
-        }
-
         for (const log of logs) {
-            // console.log("data completa do log:", log)
+          if (debugCount < 20) {
+            console.log("[useTransicoesData][RAW] log:", {
+              event: log.event,
+              data: log.data,
+              created_at: log.created_at,
+            });
+          }
+
           const data = tryParseJSON<any>(log.data) ?? {};
-          if (data.pulse_id == 9647727243) console.log("data do log:", data);
-        //   console.log("data do log:", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
-            // console.log("[useTransicoesData] Log descartado: coluna diferente");
+            console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
+            debugCount++;
             continue;
           }
 
@@ -146,14 +148,17 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
-          
-          const de = extrairLabel(prevParsed);
-          const para = extrairLabel(nextParsed);
-          console.log("de", de);
-          console.log("para", para);
-          
+
+          const de =
+            extrairLabel(prevParsed) ??
+            (typeof prevRaw === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
+          const para =
+            extrairLabel(nextParsed) ??
+            (typeof nextRaw === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
+
           if (!de || !para) {
-            // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para });
+            console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
+            debugCount++;
             continue;
           }
 
@@ -161,13 +166,15 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             (t) => t.de === de && t.para === para
           );
           if (!transicaoEsperada) {
-            // console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
+            console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
+            debugCount++;
             continue;
           }
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
           if (!itemId) {
-            // console.log("[useTransicoesData] Log descartado: sem itemId");
+            console.log("[useTransicoesData] Log descartado: sem itemId");
+            debugCount++;
             continue;
           }
 
@@ -188,6 +195,8 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             fechamento_vendas: itemInfo?.fechamento_vendas ?? null,
             performance: itemInfo?.performance ?? null,
           });
+
+          debugCount++;
         }
 
         if (cancelado) break;
