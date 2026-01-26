@@ -127,7 +127,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
         console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
         if (!logs.length) {
-          console.log("[useTransicoesData] Fim da paginação (sem logs nesta página)");
+        //   console.log("[useTransicoesData] Fim da paginação (sem logs nesta página)");
           break;
         }
 
@@ -136,12 +136,14 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           console.log("data do log:", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
-            console.log("[useTransicoesData] Log descartado: coluna diferente");
+            // console.log("[useTransicoesData] Log descartado: coluna diferente");
             continue;
           }
 
           const prevRaw = data.previousValue ?? data.previous_value ?? data.fromValue ?? data.from_value;
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
+          console.log("previousValue", prevRaw);
+          console.log("value", nextRaw);
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
 
