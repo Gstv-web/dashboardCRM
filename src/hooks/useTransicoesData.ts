@@ -108,8 +108,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         let response: any;
         try {
           response = await monday.api(query);
-          console.log("Resposta activity_logs (página " + page + "):", response);
-          console.log("Logs extraídos:", response?.data?.boards?.[0]?.activity_logs);
         } catch (err: any) {
           if (cancelado) return;
           console.error("Erro ao buscar activity_logs:", err);
@@ -119,7 +117,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         }
 
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
-        console.log("Total de logs nesta página:", logs.length);
         if (!logs.length) break;
 
         for (const log of logs) {
@@ -161,7 +158,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             performance: itemInfo?.performance ?? null,
           });
         }
-        console.log("linha acumulado:",acumulado)
 
         if (cancelado) break;
         if (logs.length < pageLimit) break;
@@ -169,6 +165,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       }
 
       if (!cancelado) {
+        console.log("LOGS FINAIS - Total de transições encontradas:", acumulado.length, acumulado);
         setRegistros(acumulado);
         setIsLoading(false);
       }
