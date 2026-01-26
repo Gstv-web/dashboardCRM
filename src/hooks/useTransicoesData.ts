@@ -85,9 +85,15 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         const from = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
         const to = new Date().toISOString();
         
-        const query = `query($boardIds: [Int!], $limit: Int, $page: Int) {
-          boards(ids: $boardIds) {
-            activity_logs(from: "${from}", to: "${to}", limit: $limit, page: $page, column_ids: ["${STATUS_COLUMN_ID}"]) {
+        const query = `query {
+          boards(ids: [${boardId}]) {
+            activity_logs(
+              from: "${from}"
+              to: "${to}"
+              limit: ${pageLimit}
+              page: ${page}
+              column_ids: ["${STATUS_COLUMN_ID}"]
+            ) {
               id
               event
               data
@@ -101,9 +107,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
         let response: any;
         try {
-          response = await monday.api(query, {
-            variables: { boardIds: [boardId], limit: pageLimit, page },
-          });
+          response = await monday.api(query);
         } catch (err: any) {
           if (cancelado) return;
           console.error("Erro ao buscar activity_logs:", err);
