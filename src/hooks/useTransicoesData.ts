@@ -179,6 +179,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       cancelado = true;
     };
   }, [boardId, itemMap]);
+  console.log("Registros de transições (useTransicoesData):", registros);
 
   return { registros, isLoading, error };
 }
