@@ -120,19 +120,19 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
         let response: any;
         try {
-          console.log("[useTransicoesData] Executando query da página", page);
+        //   console.log("[useTransicoesData] Executando query da página", page);
           response = await monday.api(query);
-          console.log("[useTransicoesData] Resposta recebida da página", page);
+        //   console.log("[useTransicoesData] Resposta recebida da página", page);
         } catch (err: any) {
           if (cancelado) return;
-          console.error("[useTransicoesData] ERRO ao buscar activity_logs:", err);
+        //   console.error("[useTransicoesData] ERRO ao buscar activity_logs:", err);
           setError("Falha ao buscar logs de atividade.");
           setIsLoading(false);
           break;
         }
 
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
-        console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
+        // console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
         for (const log of logs) {
           if (debugCount < 20) {
             console.log("[useTransicoesData][RAW] log:", {
@@ -143,10 +143,10 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           }
 
           const data = tryParseJSON<any>(log.data) ?? {};
-          console.log("DATA", data)
+        //   console.log("DATA", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
-            console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
+            // console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
             debugCount++;
             continue;
           }
@@ -168,7 +168,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const para = normalizarTexto(paraBruto);
 
           if (!de || !para) {
-            console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
+            // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
             debugCount++;
             continue;
           }
@@ -177,14 +177,14 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             (t) => normalizarTexto(t.de) === de && normalizarTexto(t.para) === para
           );
           if (!transicaoEsperada) {
-            console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
+            // console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
             debugCount++;
             continue;
           }
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
           if (!itemId) {
-            console.log("[useTransicoesData] Log descartado: sem itemId");
+            // console.log("[useTransicoesData] Log descartado: sem itemId");
             debugCount++;
             continue;
           }
