@@ -66,10 +66,15 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
   }, [items]);
 
   useEffect(() => {
-    if (!boardId) return;
+    if (!boardId) {
+      console.log("[useTransicoesData] Sem boardId, abortando");
+      return;
+    }
+    console.log("[useTransicoesData] Iniciando busca com boardId:", boardId);
     let cancelado = false;
 
     async function carregar() {
+      console.log("[useTransicoesData] Função carregar() iniciada");
       setIsLoading(true);
       setError(null);
 
@@ -82,6 +87,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       const acumulado: TransicaoRegistro[] = [];
 
       while (true) {
+        console.log("[useTransicoesData] Buscando página", page);
         const from = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
         const to = new Date().toISOString();
         
@@ -107,22 +113,31 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
         let response: any;
         try {
+          console.log("[useTransicoesData] Executando query da página", page);
           response = await monday.api(query);
+          console.log("[useTransicoesData] Resposta recebida da página", page);
         } catch (err: any) {
           if (cancelado) return;
-          console.error("Erro ao buscar activity_logs:", err);
+          console.error("[useTransicoesData] ERRO ao buscar activity_logs:", err);
           setError("Falha ao buscar logs de atividade.");
           setIsLoading(false);
           break;
         }
 
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
-        if (!logs.length) break;
+        console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
+        if (!logs.length) {
+          console.log("[useTransicoesData] Fim da paginação (sem logs nesta página)");
+          break;
+        }
 
         for (const log of logs) {
           const data = tryParseJSON<any>(log.data) ?? {};
           const colunaId = data.columnId || data.column_id;
-          if (colunaId && colunaId !== STATUS_COLUMN_ID) continue;
+          if (colunaId && colunaId !== STATUS_COLUMN_ID) {
+            console.log("[useTransicoesData] Log descartado: coluna diferente");
+            continue;
+          }
 
           const prevRaw = data.previousValue ?? data.previous_value ?? data.fromValue ?? data.from_value;
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
@@ -131,19 +146,29 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const de = extrairLabel(prevParsed);
           const para = extrairLabel(nextParsed);
-          if (!de || !para) continue;
+          if (!de || !para) {
+            console.log("[useTransicoesData] Log descartado: sem de/para", { de, para });
+            continue;
+          }
 
           const transicaoEsperada = TRANSICOES_INTERESSE.find(
             (t) => t.de === de && t.para === para
           );
-          if (!transicaoEsperada) continue;
+          if (!transicaoEsperada) {
+            console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
+            continue;
+          }
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
-          if (!itemId) continue;
+          if (!itemId) {
+            console.log("[useTransicoesData] Log descartado: sem itemId");
+            continue;
+          }
 
           const itemName = data.item?.name ?? data.itemName ?? data.item_name ?? "Item";
           const itemInfo = itemMap.get(itemId);
 
+          console.log("[useTransicoesData] Log ACEITO:", { de, para, itemId, itemName });
           acumulado.push({
             logId: String(log.id),
             itemId,
