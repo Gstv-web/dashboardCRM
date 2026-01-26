@@ -147,7 +147,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const de = extrairLabel(prevParsed);
           const para = extrairLabel(nextParsed);
           if (!de || !para) {
-            console.log("[useTransicoesData] Log descartado: sem de/para", { de, para });
+            // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para });
             continue;
           }
 
@@ -155,13 +155,13 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             (t) => t.de === de && t.para === para
           );
           if (!transicaoEsperada) {
-            console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
+            // console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
             continue;
           }
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
           if (!itemId) {
-            console.log("[useTransicoesData] Log descartado: sem itemId");
+            // console.log("[useTransicoesData] Log descartado: sem itemId");
             continue;
           }
 
