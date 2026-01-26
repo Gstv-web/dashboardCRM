@@ -132,8 +132,9 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         }
 
         for (const log of logs) {
-            console.log("data completa do log:", log)
+            // console.log("data completa do log:", log)
           const data = tryParseJSON<any>(log.data) ?? {};
+          if (data.pulse_id == 9647727243) console.log("data do log:", data);
         //   console.log("data do log:", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
