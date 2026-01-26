@@ -53,6 +53,7 @@ function extrairLabel(obj: any): string | undefined {
 
 function normalizarTexto(valor: string | undefined): string | undefined {
   if (!valor) return undefined;
+  if (typeof valor !== "string") return undefined;
   return valor.replace(/\s+/g, " ").trim();
 }
 
