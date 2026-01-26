@@ -51,6 +51,11 @@ function extrairLabel(obj: any): string | undefined {
   return obj.label || obj.text || obj.title || obj.name;
 }
 
+function normalizarTexto(valor: string | undefined): string | undefined {
+  if (!valor) return undefined;
+  return valor.replace(/\s+/g, " ").trim();
+}
+
 export function useTransicoesData(boardId: number | null, items: any[]) {
   const [registros, setRegistros] = useState<TransicaoRegistro[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -149,12 +154,15 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
 
-          const de =
+          const deBruto =
             extrairLabel(prevParsed) ??
             (typeof prevRaw === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
-          const para =
+          const paraBruto =
             extrairLabel(nextParsed) ??
             (typeof nextRaw === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
+
+          const de = normalizarTexto(deBruto);
+          const para = normalizarTexto(paraBruto);
 
           if (!de || !para) {
             console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
@@ -163,7 +171,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           }
 
           const transicaoEsperada = TRANSICOES_INTERESSE.find(
-            (t) => t.de === de && t.para === para
+            (t) => normalizarTexto(t.de) === de && normalizarTexto(t.para) === para
           );
           if (!transicaoEsperada) {
             console.log("[useTransicoesData] Log descartado: transição não está em TRANSICOES_INTERESSE", { de, para });
