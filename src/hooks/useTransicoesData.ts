@@ -143,6 +143,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           }
 
           const data = tryParseJSON<any>(log.data) ?? {};
+          console.log("DATA", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
             console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
