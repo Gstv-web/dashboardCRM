@@ -146,11 +146,12 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
-          console.log("previousValue", prevParsed);
-          console.log("value", nextParsed);
-
+          
           const de = extrairLabel(prevParsed);
           const para = extrairLabel(nextParsed);
+          console.log("de", de);
+          console.log("para", para);
+          
           if (!de || !para) {
             // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para });
             continue;
