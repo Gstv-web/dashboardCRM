@@ -4,18 +4,23 @@ import { useMondayContext } from "./hooks/useMondayContext";
 import { useMondayData } from "./hooks/useMondayData";
 import { useEvolucaoData, PeriodoChave } from "./hooks/useEvolucaoData";
 import { useEvolucaoMesData } from "./hooks/useEvolucaoMesData";
+import { useTransicoesData } from "./hooks/useTransicoesData";
 import CardEtapa from "./components/CardEtapa";
 import GraficoEvolucao from "./components/GraficoEvolucao";
 import GraficoEvolucaoMes from "./components/GraficoEvolucaoMes";
+import GraficoTransicoes from "./components/GraficoTransicoes";
 import "./App.css";
 
 function App() {
   const { boardId } = useMondayContext();
   const { items, isLoading } = useMondayData(boardId);
+  const { registros: transicoesRegistros, isLoading: isLoadingTransicoes } =
+    useTransicoesData(boardId, items);
 
   const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string>();
   const [vendedorGrafico, setVendedorGrafico] = useState<string>();
   const [abaAtiva, setAbaAtiva] = useState<string>("Evolução Mês Atual");
+  const [periodoTransicoes, setPeriodoTransicoes] = useState<number>(30);
 
   // Estado do ponto selecionado
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
@@ -50,6 +55,49 @@ function App() {
 
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
+  const dadosTransicoes = useMemo(() => {
+    const limiteMs = Date.now() - periodoTransicoes * 24 * 60 * 60 * 1000;
+
+    const filtradosPorData = transicoesRegistros.filter((t) => {
+      const tMs = new Date(t.createdAt).getTime();
+      if (Number.isNaN(tMs)) return false;
+      return tMs >= limiteMs;
+    });
+
+    const filtradosPorVendedor = vendedorGrafico
+      ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
+      : filtradosPorData;
+
+    const mapa: Record<string, { total: number; items: any[] }> = {};
+
+    filtradosPorVendedor.forEach((t) => {
+      const chave = `${t.de} → ${t.para}`;
+      if (!mapa[chave]) mapa[chave] = { total: 0, items: [] };
+      mapa[chave].total += 1;
+      mapa[chave].items.push({
+        id: t.itemId,
+        name: t.itemName,
+        fechamento_vendas: t.fechamento_vendas,
+        valor_contrato: t.valor_contrato,
+        etapa: t.para,
+        vendedor: t.vendedor,
+        performance: t.performance,
+        data_transicao: t.createdAt,
+      });
+    });
+
+    return Object.entries(mapa)
+      .map(([transicao, info]) => ({
+        transicao,
+        total: info.total,
+        items: info.items.sort(
+          (a, b) =>
+            new Date(b.data_transicao || 0).getTime() -
+            new Date(a.data_transicao || 0).getTime()
+        ),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
   console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
   // console.log("dados de useEvolucaoData em App.tsx:", dadosGrafico);
 
@@ -132,10 +180,14 @@ function App() {
         {/* GRÁFICO COM ABAS */}
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           <div className="flex border-b border-gray-300">
-            {["Evolução Mês Atual", "Evolução 90 dias"].map((aba) => (
+            {["Evolução Mês Atual", "Evolução 90 dias", "Transições"].map((aba) => (
               <button
                 key={aba}
-                onClick={() => setAbaAtiva(aba)}
+                onClick={() => {
+                  setAbaAtiva(aba);
+                  setPontoSelecionado(null);
+                  setFiltroEtapa("");
+                }}
                 className={`px-6 py-3 font-semibold transition-colors duration-200 ${abaAtiva === aba
                     ? "border-b-4 border-blue-600 text-blue-600"
                     : "text-gray-500 hover:text-gray-700"
@@ -341,6 +393,123 @@ function App() {
                           {itensFiltradosPorEtapa.map((item: any) => (
                             <tr key={item.id} className="border-b">
                               <td className="p-2">{item.name}</td>
+                              <td className="p-2">
+                                {formatarData(item?.fechamento_vendas)}
+                              </td>
+                              <td className="p-2">
+                                {formatarDinheiro(item.valor_contrato)}
+                              </td>
+                              <td className="p-2">{item.etapa}</td>
+                              <td className="p-2">{item.vendedor}</td>
+                              <td className="p-2">{item.performance}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ====================== TRANSIÇÕES =========================== */}
+            {abaAtiva === "Transições" && (
+              <>
+                <div className="dashboard-filtro flex justify-between items-center p-4 gap-4 flex-wrap">
+                  <h2 className="font-bold">Transições de etapa</h2>
+
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div>
+                      <span className="mr-2">Filtrar por vendedor:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={vendedorGrafico || ""}
+                        onChange={(e) =>
+                          setVendedorGrafico(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todos os vendedores</option>
+                        {vendedoresUnicos.map((v) => (
+                          <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <span className="mr-2">Período:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={periodoTransicoes}
+                        onChange={(e) => setPeriodoTransicoes(Number(e.target.value))}
+                      >
+                        {[7, 14, 30, 60, 90].map((dias) => (
+                          <option key={dias} value={dias}>
+                            Últimos {dias} dias
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="dashboard-grafico m-2 p-2">
+                  {isLoadingTransicoes ? (
+                    <p className="text-center text-gray-500">Carregando transições...</p>
+                  ) : (
+                    <GraficoTransicoes
+                      dados={dadosTransicoes}
+                      onBarClick={(p) => {
+                        setFiltroEtapa("");
+                        setPontoSelecionado({
+                          periodo: p.transicao,
+                          items: p.items,
+                        });
+                      }}
+                    />
+                  )}
+                </div>
+
+                {pontoSelecionado && (
+                  <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
+                    <div className="flex items-center gap-4 mb-4">
+                      <h3 className="font-bold text-lg">
+                        {pontoSelecionado.periodo}
+                      </h3>
+
+                      <select
+                        className="etapa-filtro border p-2 rounded bg-white ml-auto"
+                        value={filtroEtapa}
+                        onChange={(e) => setFiltroEtapa(e.target.value)}
+                      >
+                        <option value="">Todas as etapas</option>
+                        {etapasUnicas.map((etapa) => (
+                          <option key={etapa}>{etapa}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {!itensFiltradosPorEtapa.length ? (
+                      <p className="text-gray-500">Nenhum item nesta transição.</p>
+                    ) : (
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b bg-gray-100">
+                            <th className="p-2 text-left">Nome</th>
+                            <th className="p-2 text-left">Data da transição</th>
+                            <th className="p-2 text-left">Fechamento</th>
+                            <th className="p-2 text-left">Valor</th>
+                            <th className="p-2 text-left">Etapa</th>
+                            <th className="p-2 text-left">Vendedor</th>
+                            <th className="p-2 text-left">Performance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itensFiltradosPorEtapa.map((item: any) => (
+                            <tr key={item.id} className="border-b">
+                              <td className="p-2">{item.name}</td>
+                              <td className="p-2">
+                                {formatarData(item?.data_transicao)}
+                              </td>
                               <td className="p-2">
                                 {formatarData(item?.fechamento_vendas)}
                               </td>
