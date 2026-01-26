@@ -99,10 +99,10 @@ function App() {
       .sort((a, b) => b.total - a.total);
   }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
   
-  console.log("transicoesRegistros recebidos do hook:", transicoesRegistros);
-  console.log("dadosTransicoes processados:", dadosTransicoes);
-  console.log("isLoadingTransicoes:", isLoadingTransicoes);
-  console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
+  // console.log("transicoesRegistros recebidos do hook:", transicoesRegistros);
+  // console.log("dadosTransicoes processados:", dadosTransicoes);
+  // console.log("isLoadingTransicoes:", isLoadingTransicoes);
+  // console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
   // console.log("dados de useEvolucaoData em App.tsx:", dadosGrafico);
 
   function formatarData(iso: string | Date | null | undefined) {
