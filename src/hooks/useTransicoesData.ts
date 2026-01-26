@@ -161,6 +161,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             performance: itemInfo?.performance ?? null,
           });
         }
+        console.log("linha acumulado:",acumulado)
 
         if (cancelado) break;
         if (logs.length < pageLimit) break;
