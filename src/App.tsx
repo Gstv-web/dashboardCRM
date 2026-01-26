@@ -56,17 +56,23 @@ function App() {
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
   const dadosTransicoes = useMemo(() => {
+    console.log("[dadosTransicoes] Iniciando processamento...");
+    console.log("[dadosTransicoes] transicoesRegistros recebidos:", transicoesRegistros);
+    
     const limiteMs = Date.now() - periodoTransicoes * 24 * 60 * 60 * 1000;
+    console.log("[dadosTransicoes] Limite de ms:", limiteMs);
 
     const filtradosPorData = transicoesRegistros.filter((t) => {
       const tMs = new Date(t.createdAt).getTime();
       if (Number.isNaN(tMs)) return false;
       return tMs >= limiteMs;
     });
+    console.log("[dadosTransicoes] Após filtro por data:", filtradosPorData.length, "registros");
 
     const filtradosPorVendedor = vendedorGrafico
       ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
       : filtradosPorData;
+    console.log("[dadosTransicoes] Após filtro por vendedor:", filtradosPorVendedor.length, "registros");
 
     const mapa: Record<string, { total: number; items: any[] }> = {};
 
@@ -86,7 +92,9 @@ function App() {
       });
     });
 
-    return Object.entries(mapa)
+    console.log("[dadosTransicoes] Mapa agregado:", Object.keys(mapa).length, "transições únicas");
+
+    const resultado = Object.entries(mapa)
       .map(([transicao, info]) => ({
         transicao,
         total: info.total,
@@ -97,6 +105,9 @@ function App() {
         ),
       }))
       .sort((a, b) => b.total - a.total);
+    
+    console.log("[dadosTransicoes] Resultado final:", resultado);
+    return resultado;
   }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
   
   // console.log("transicoesRegistros recebidos do hook:", transicoesRegistros);
