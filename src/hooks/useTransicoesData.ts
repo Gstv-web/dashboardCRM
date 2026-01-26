@@ -132,8 +132,9 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         }
 
         for (const log of logs) {
+            console.log("data completa do log:", log)
           const data = tryParseJSON<any>(log.data) ?? {};
-          console.log("data do log:", data)
+        //   console.log("data do log:", data)
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
             // console.log("[useTransicoesData] Log descartado: coluna diferente");
@@ -142,10 +143,10 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const prevRaw = data.previousValue ?? data.previous_value ?? data.fromValue ?? data.from_value;
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
-          console.log("previousValue", prevRaw);
-          console.log("value", nextRaw);
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
+          console.log("previousValue", prevParsed);
+          console.log("value", nextParsed);
 
           const de = extrairLabel(prevParsed);
           const para = extrairLabel(nextParsed);
