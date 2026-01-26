@@ -75,29 +75,29 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
       const limiteDias = 90;
       const sinceDate = new Date(Date.now() - limiteDias * 24 * 60 * 60 * 1000);
-      const sinceIso = sinceDate.toISOString();
+      const sinceMs = sinceDate.getTime();
 
       const pageLimit = 200;
       let page = 1;
       const acumulado: TransicaoRegistro[] = [];
 
       while (true) {
-        const query = `query($boardIds: [Int], $since: String, $page: Int, $limit: Int) {\n          activity_logs(board_ids: $boardIds, since: $since, page: $page, limit: $limit, column_ids: ["${STATUS_COLUMN_ID}"]) {\n            id\n            event\n            data\n            created_at\n            entity { ... on Item { id name } }\n          }\n        }`;
+        const query = `query($boardIds: [Int], $page: Int, $limit: Int) {\n          audit_logs(board_ids: $boardIds, page: $page, limit: $limit) {\n            id\n            event\n            data\n            created_at\n            entity { ... on Item { id name } }\n          }\n        }`;
 
         let response: any;
         try {
           response = await monday.api(query, {
-            variables: { boardIds: [boardId], since: sinceIso, page, limit: pageLimit },
+            variables: { boardIds: [boardId], page, limit: pageLimit },
           });
         } catch (err: any) {
           if (cancelado) return;
-          console.error("Erro ao buscar activity_logs:", err);
+          console.error("Erro ao buscar audit_logs:", err);
           setError("Falha ao buscar logs de atividade.");
           setIsLoading(false);
           break;
         }
 
-        const logs: ActivityLog[] = response?.data?.activity_logs ?? [];
+        const logs: ActivityLog[] = response?.data?.audit_logs ?? [];
         if (!logs.length) break;
 
         for (const log of logs) {
@@ -124,6 +124,11 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const itemName = log.entity?.name ?? data.itemName ?? data.item_name ?? "Item";
           const itemInfo = itemMap.get(itemId);
+          const createdAtMs = new Date(log.created_at || new Date().toISOString()).getTime();
+          
+          // filtro por data (últimos 90 dias)
+          const sinceDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).getTime();
+          if (createdAtMs < sinceDate) continue;
 
           acumulado.push({
             logId: String(log.id),
