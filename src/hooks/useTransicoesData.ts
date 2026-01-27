@@ -57,6 +57,17 @@ function normalizarTexto(valor: string | undefined): string | undefined {
   return valor.replace(/\s+/g, " ").trim();
 }
 
+function converterTimestampMondayParaData(timestamp17Digitos: string | number | undefined): string {
+  if (!timestamp17Digitos) return new Date().toISOString();
+  
+  const num = typeof timestamp17Digitos === "string" ? parseInt(timestamp17Digitos, 10) : timestamp17Digitos;
+  
+  // Converte 17-digit time para milissegundos
+  const ms = Math.round(num / 10000);
+  
+  return new Date(ms).toISOString();
+}
+
 export function useTransicoesData(boardId: number | null, items: any[]) {
   const [registros, setRegistros] = useState<TransicaoRegistro[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -225,7 +236,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             itemName,
             de,
             para,
-            createdAt: log.created_at || new Date().toISOString(),
+            createdAt: converterTimestampMondayParaData(log.created_at),
             vendedor: itemInfo?.vendedor,
             etapaAtual: itemInfo?.etapa ?? para,
             valor_contrato: itemInfo?.valor_contrato ?? null,
