@@ -182,7 +182,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           if (de === "Oportunidade - 50%") {
             console.log("de:",  de );
           }
-          if (para === "Prospect - 25%") {
+          if (para === "Forecast - 75%") {
             console.log("para:",  para );
           }
           const transicaoEsperada = TRANSICOES_INTERESSE.find(
