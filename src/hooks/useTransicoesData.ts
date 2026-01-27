@@ -195,7 +195,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
           if (!itemId) {
-            // console.log("[useTransicoesData] Log descartado: sem itemId");
+            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data:", { de, para, dataItem: data.item, dataItemId: data.itemId });
             debugCount++;
             continue;
           }
@@ -203,7 +203,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const itemName = data.item?.name ?? data.itemName ?? data.item_name ?? "Item";
           const itemInfo = itemMap.get(itemId);
 
-          console.log("[useTransicoesData] Log ACEITO:", { de, para, itemId, itemName });
+          console.log("[useTransicoesData] ✅ Log ACEITO E ADICIONADO:", { de, para, itemId, itemName });
           acumulado.push({
             logId: String(log.id),
             itemId,
