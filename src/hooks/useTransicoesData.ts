@@ -143,11 +143,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           }
 
           const data = tryParseJSON<any>(log.data) ?? {};
-          
-          console.log("[useTransicoesData] DATA object keys:", Object.keys(data));
-          console.log("[useTransicoesData] DATA completo:", JSON.stringify(data, null, 2));
-          
-          const colunaId = data.columnId || data.column_id;
+          const colunaId = data.columnId || data.column_id || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
             // console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
             debugCount++;
@@ -196,33 +192,27 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           
           console.log("[useTransicoesData] Log ACEITO - Transição válida:", { de, para });
 
-          // Tenta extrair itemId de várias possibilidades dentro de data
+          // Extrai itemId - em activity_logs é "pulse_id"
           const itemId = String(
-            data.item?.id ?? 
+            data.pulse_id ?? 
             data.itemId ?? 
             data.item_id ?? 
             data.entity?.id ??
-            data.entityId ??
-            data.entity_id ??
-            log.entity?.id ??
             ""
           );
           
           if (!itemId) {
-            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data structure:", { de, para, dataKeys: Object.keys(data), logEntity: log.entity });
+            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data keys:", Object.keys(data));
             debugCount++;
             continue;
           }
 
-          // Tenta extrair itemName de várias possibilidades
+          // Extrai itemName - em activity_logs é "pulse_name"
           const itemName = String(
-            data.item?.name ?? 
+            data.pulse_name ?? 
             data.itemName ?? 
             data.item_name ?? 
             data.entity?.name ??
-            data.entityName ??
-            data.entity_name ??
-            log.entity?.name ??
             "Item"
           );
           
