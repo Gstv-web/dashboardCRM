@@ -180,10 +180,10 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             continue;
           }
           if (de === "Oportunidade - 50%") {
-            console.log("de:",  de );
-          }
-          if (para === "Forecast - 75%") {
-            console.log("para:",  para );
+              console.log("de:",  de );
+              if (para === "Forecast - 75%") {
+                console.log("para:",  para );
+              }
           }
           const transicaoEsperada = TRANSICOES_INTERESSE.find(
             (t) => normalizarTexto(t.de) === de && normalizarTexto(t.para) === para
