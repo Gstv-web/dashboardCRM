@@ -158,11 +158,11 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const deBruto =
             extrairLabel(prevParsed) ??
-            (typeof prevRaw === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
-            console.log("DE BRUTO", deBruto)
+            (typeof prevRaw.text === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
+            console.log("DE BRUTO", deBruto.text)
           const paraBruto =
             extrairLabel(nextParsed) ??
-            (typeof nextRaw === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
+            (typeof nextRaw.text === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
 
           const de = prevParsed?.text || undefined;
           const para = nextParsed?.text || undefined;
