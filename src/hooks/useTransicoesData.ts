@@ -155,6 +155,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
+          console.log("PREV parsed", prevParsed);
 
           const deBruto =
             extrairLabel(prevParsed) ??
