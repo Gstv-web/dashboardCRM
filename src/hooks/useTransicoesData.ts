@@ -165,10 +165,14 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         //     extrairLabel(nextParsed) ??
         //     (typeof nextRaw.text === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
 
-          const de = prevParsed?.label?.text || undefined;
-          const para = nextParsed?.label?.text || undefined;
-          console.log("DE normalized", de)
-          console.log("PARA normalized", para)
+          const deBruto = prevParsed?.label?.text || undefined;
+          const paraBruto = nextParsed?.label?.text || undefined;
+          
+          const de = normalizarTexto(deBruto);
+          const para = normalizarTexto(paraBruto);
+          
+          console.log("DE bruto:", deBruto, "→ normalizado:", de);
+          console.log("PARA bruto:", paraBruto, "→ normalizado:", para);
 
           if (!de || !para) {
             // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
