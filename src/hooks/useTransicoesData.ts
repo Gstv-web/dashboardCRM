@@ -155,18 +155,18 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           const nextRaw = data.value ?? data.toValue ?? data.to_value;
           const prevParsed = tryParseJSON<any>(prevRaw);
           const nextParsed = tryParseJSON<any>(nextRaw);
-          console.log("PREV parsed", prevParsed);
+        //   console.log("PREV parsed", prevParsed);
 
-          const deBruto =
-            extrairLabel(prevParsed) ??
-            (typeof prevRaw.text === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
-            // console.log("DE BRUTO", deBruto.text)
-          const paraBruto =
-            extrairLabel(nextParsed) ??
-            (typeof nextRaw.text === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
+        //   const deBruto =
+        //     extrairLabel(prevParsed) ??
+        //     (typeof prevRaw.text === "string" ? prevRaw : prevRaw != null ? String(prevRaw) : undefined);
+        //     // console.log("DE BRUTO", deBruto.text)
+        //   const paraBruto =
+        //     extrairLabel(nextParsed) ??
+        //     (typeof nextRaw.text === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
 
-          const de = deBruto?.text || undefined;
-          const para = paraBruto?.text || undefined;
+          const de = prevParsed?.label?.text || undefined;
+          const para = nextParsed?.label?.text || undefined;
           console.log("DE normalized", de)
           console.log("PARA normalized", para)
 
