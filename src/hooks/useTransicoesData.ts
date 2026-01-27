@@ -166,6 +166,8 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           const de = normalizarTexto(deBruto);
           const para = normalizarTexto(paraBruto);
+          console.log("DE normalized", de)
+          console.log("PARA normalized", para)
 
           if (!de || !para) {
             // console.log("[useTransicoesData] Log descartado: sem de/para", { de, para, prevRaw, nextRaw });
