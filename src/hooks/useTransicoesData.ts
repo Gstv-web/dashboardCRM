@@ -179,47 +179,19 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             debugCount++;
             continue;
           }
-          if (de === "Oportunidade - 50%") {
-              console.log("de:",  de );
-              if (para === "Forecast - 75%") {
-                console.log("para:",  para );
-              }
-          }
-          
           const transicaoEsperada = TRANSICOES_INTERESSE.find((t) => {
             const tDe = normalizarTexto(t.de);
             const tPara = normalizarTexto(t.para);
-            const match = tDe === de && tPara === para;
-            
-            // DEBUG: Se encontrou a etapa "Oportunidade - 50%", mostra o teste
-            if (de === "Oportunidade - 50%" && para === "Forecast - 75%") {
-              console.log("🔍 Testando transição:", {
-                tDe,
-                de,
-                "tDe === de": tDe === de,
-                tPara,
-                para,
-                "tPara === para": tPara === para,
-                match,
-                transicaoDesejada: t
-              });
-            }
-            
-            return match;
+            return tDe === de && tPara === para;
           });
           
           if (!transicaoEsperada) {
-            if (de === "Oportunidade - 50%" && para === "Forecast - 75%") {
-              console.log("❌ Transição NÃO encontrada em TRANSICOES_INTERESSE!");
-              console.log("TRANSICOES_INTERESSE disponíveis:", TRANSICOES_INTERESSE);
-            }
+            console.log("[useTransicoesData] Log descartado: transição NÃO está em TRANSICOES_INTERESSE", { de, para });
             debugCount++;
             continue;
           }
           
-          if (de === "Oportunidade - 50%" && para === "Forecast - 75%") {
-            console.log("✅ Transição ENCONTRADA!");
-          }
+          console.log("[useTransicoesData] Log ACEITO - Transição válida:", { de, para });
 
           const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
           if (!itemId) {
