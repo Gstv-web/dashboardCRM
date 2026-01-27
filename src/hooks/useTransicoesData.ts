@@ -164,8 +164,8 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             extrairLabel(nextParsed) ??
             (typeof nextRaw === "string" ? nextRaw : nextRaw != null ? String(nextRaw) : undefined);
 
-          const de = normalizarTexto(deBruto);
-          const para = normalizarTexto(paraBruto);
+          const de = prevParsed?.text || undefined;
+          const para = nextParsed?.text || undefined;
           console.log("DE normalized", de)
           console.log("PARA normalized", para)
 
