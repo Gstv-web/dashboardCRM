@@ -143,7 +143,10 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           }
 
           const data = tryParseJSON<any>(log.data) ?? {};
-        //   console.log("DATA", data)
+          
+          console.log("[useTransicoesData] DATA object keys:", Object.keys(data));
+          console.log("[useTransicoesData] DATA completo:", JSON.stringify(data, null, 2));
+          
           const colunaId = data.columnId || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
             // console.log("[useTransicoesData] Log descartado: coluna diferente", colunaId);
@@ -193,14 +196,36 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           
           console.log("[useTransicoesData] Log ACEITO - Transição válida:", { de, para });
 
-          const itemId = String(data.item?.id ?? data.itemId ?? data.item_id ?? "");
+          // Tenta extrair itemId de várias possibilidades dentro de data
+          const itemId = String(
+            data.item?.id ?? 
+            data.itemId ?? 
+            data.item_id ?? 
+            data.entity?.id ??
+            data.entityId ??
+            data.entity_id ??
+            log.entity?.id ??
+            ""
+          );
+          
           if (!itemId) {
-            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data:", { de, para, dataItem: data.item, dataItemId: data.itemId });
+            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data structure:", { de, para, dataKeys: Object.keys(data), logEntity: log.entity });
             debugCount++;
             continue;
           }
 
-          const itemName = data.item?.name ?? data.itemName ?? data.item_name ?? "Item";
+          // Tenta extrair itemName de várias possibilidades
+          const itemName = String(
+            data.item?.name ?? 
+            data.itemName ?? 
+            data.item_name ?? 
+            data.entity?.name ??
+            data.entityName ??
+            data.entity_name ??
+            log.entity?.name ??
+            "Item"
+          );
+          
           const itemInfo = itemMap.get(itemId);
 
           console.log("[useTransicoesData] ✅ Log ACEITO E ADICIONADO:", { de, para, itemId, itemName });
