@@ -10,24 +10,31 @@ import {
 } from "recharts";
 
 interface GraficoTransicoesProps {
-  dados: Array<{ data: string; transicao: string; total: number }>;
-  onBarClick?: (payload: any) => void;
+  dados: Array<{ data: string; transicao: string; total: number; items?: any[] }>;
+  onPontoClick?: (ponto: any) => void;
 }
 
-export default function GraficoTransicoes({ dados }: GraficoTransicoesProps) {
+export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransicoesProps) {
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
   // Agrupa dados por data, criando uma propriedade para cada transição
   const mapaDataTransicoes: Record<string, any> = {};
+  const mapaDataItems: Record<string, any[]> = {}; // Armazena items por data
   const transicoesUnicas = new Set<string>();
 
-  dados.forEach(({ data, transicao, total }) => {
+  dados.forEach(({ data, transicao, total, items }) => {
     if (!mapaDataTransicoes[data]) {
       mapaDataTransicoes[data] = { data };
+      mapaDataItems[data] = [];
     }
     mapaDataTransicoes[data][transicao] = total;
     transicoesUnicas.add(transicao);
+    
+    // Acumula todos os items daquela data
+    if (items) {
+      mapaDataItems[data].push(...items);
+    }
   });
 
   const dadosFormatados = Object.values(mapaDataTransicoes).sort(
@@ -78,6 +85,17 @@ export default function GraficoTransicoes({ dados }: GraficoTransicoesProps) {
         <LineChart
           data={dadosFormatados}
           margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
+          onClick={(e: any) => {
+            if (e && e.activeLabel && onPontoClick) {
+              const dataClicada = e.activeLabel;
+              const items = mapaDataItems[dataClicada] || [];
+              onPontoClick({
+                periodo: formatarData(dataClicada),
+                data: dataClicada,
+                items: items,
+              });
+            }
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -100,8 +118,8 @@ export default function GraficoTransicoes({ dados }: GraficoTransicoesProps) {
               dataKey={transicao}
               stroke={cores[idx % cores.length]}
               strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+              dot={{ r: 4, cursor: "pointer" }}
+              activeDot={{ r: 6, cursor: "pointer" }}
             />
           ))}
         </LineChart>

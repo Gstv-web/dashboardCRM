@@ -471,7 +471,16 @@ function App() {
                   {isLoadingTransicoes ? (
                     <p className="text-center text-gray-500">Carregando transições...</p>
                   ) : (
-                    <GraficoTransicoes dados={dadosTransicoes} />
+                    <GraficoTransicoes
+                      dados={dadosTransicoes}
+                      onPontoClick={(p) => {
+                        setFiltroEtapa("");
+                        setPontoSelecionado({
+                          periodo: p.periodo,
+                          items: p.items,
+                        });
+                      }}
+                    />
                   )}
                 </div>
 
