@@ -74,55 +74,6 @@ function App() {
       : filtradosPorData;
     console.log("[dadosTransicoes] Após filtro por vendedor:", filtradosPorVendedor.length, "registros");
 
-    const mapa: Record<string, { total: number; items: any[] }> = {};
-
-    filtradosPorVendedor.forEach((t) => {
-      const chave = `${t.de} → ${t.para}`;
-      if (!mapa[chave]) mapa[chave] = { total: 0, items: [] };
-      mapa[chave].total += 1;
-      mapa[chave].items.push({
-        id: t.itemId,
-        name: t.itemName,
-        fechamento_vendas: t.fechamento_vendas,
-        valor_contrato: t.valor_contrato,
-        etapa: t.para,
-        vendedor: t.vendedor,
-        performance: t.performance,
-        data_transicao: t.createdAt,
-      });
-    });
-
-    console.log("[dadosTransicoes] Mapa agregado:", Object.keys(mapa).length, "transições únicas");
-
-    const resultado = Object.entries(mapa)
-      .map(([transicao, info]) => ({
-        transicao,
-        total: info.total,
-        items: info.items.sort(
-          (a, b) =>
-            new Date(b.data_transicao || 0).getTime() -
-            new Date(a.data_transicao || 0).getTime()
-        ),
-      }))
-      .sort((a, b) => b.total - a.total);
-    
-    console.log("[dadosTransicoes] Resultado final:", resultado);
-    return resultado;
-  }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
-
-  const dadosTransicoesPorData = useMemo(() => {
-    const limiteMs = Date.now() - periodoTransicoes * 24 * 60 * 60 * 1000;
-
-    const filtradosPorData = transicoesRegistros.filter((t) => {
-      const tMs = new Date(t.createdAt).getTime();
-      if (Number.isNaN(tMs)) return false;
-      return tMs >= limiteMs;
-    });
-
-    const filtradosPorVendedor = vendedorGrafico
-      ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
-      : filtradosPorData;
-
     const mapa: Record<string, { data: string; transicao: string; total: number; items: any[] }> = {};
 
     filtradosPorVendedor.forEach((t) => {
@@ -147,11 +98,16 @@ function App() {
       });
     });
 
-    return Object.values(mapa).sort((a, b) => {
+    console.log("[dadosTransicoes] Mapa agregado:", Object.keys(mapa).length, "transições únicas");
+
+    const resultado = Object.values(mapa).sort((a, b) => {
       const dataDiff = new Date(b.data).getTime() - new Date(a.data).getTime();
       if (dataDiff !== 0) return dataDiff;
       return b.total - a.total;
     });
+    
+    console.log("[dadosTransicoes] Resultado final:", resultado);
+    return resultado;
   }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
   
   // console.log("transicoesRegistros recebidos do hook:", transicoesRegistros);
@@ -515,47 +471,9 @@ function App() {
                   {isLoadingTransicoes ? (
                     <p className="text-center text-gray-500">Carregando transições...</p>
                   ) : (
-                    <GraficoTransicoes
-                      dados={dadosTransicoes}
-                      onBarClick={(p) => {
-                        setFiltroEtapa("");
-                        setPontoSelecionado({
-                          periodo: p.transicao,
-                          items: p.items,
-                        });
-                      }}
-                    />
+                    <GraficoTransicoes dados={dadosTransicoes} />
                   )}
                 </div>
-
-                {!isLoadingTransicoes && (
-                  <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
-                    <h3 className="font-bold text-lg mb-3">Resumo por data da transição</h3>
-
-                    {!dadosTransicoesPorData.length ? (
-                      <p className="text-gray-500">Nenhuma transição no período.</p>
-                    ) : (
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b bg-gray-100">
-                            <th className="p-2 text-left">Data</th>
-                            <th className="p-2 text-left">Transição</th>
-                            <th className="p-2 text-left">Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {dadosTransicoesPorData.map((linha) => (
-                            <tr key={`${linha.data}-${linha.transicao}`} className="border-b">
-                              <td className="p-2">{formatarData(linha.data)}</td>
-                              <td className="p-2">{linha.transicao}</td>
-                              <td className="p-2">{linha.total}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                )}
 
                 {pontoSelecionado && (
                   <div className="mt-4 p-4 border rounded-xl bg-gray-50 shadow-sm">
