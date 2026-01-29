@@ -118,7 +118,7 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
               stackId="transicoes"
               fill={cores[idx % cores.length]}
               cursor="pointer"
-              barSize={20}
+              barSize={26}
             />
           ))}
         </BarChart>
