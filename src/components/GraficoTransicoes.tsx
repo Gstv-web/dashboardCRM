@@ -1,6 +1,6 @@
 import {
-  Line,
-  LineChart,
+  Bar,
+  BarChart,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -82,7 +82,7 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
   return (
     <div className="w-full h-[400px]">
       <ResponsiveContainer>
-        <LineChart
+        <BarChart
           data={dadosFormatados}
           margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
           onClick={(e: any) => {
@@ -112,17 +112,15 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
           <Legend />
 
           {transicoesArray.map((transicao, idx) => (
-            <Line
+            <Bar
               key={transicao}
-              type="monotone"
               dataKey={transicao}
-              stroke={cores[idx % cores.length]}
-              strokeWidth={2}
-              dot={{ r: 4, cursor: "pointer" }}
-              activeDot={{ r: 6, cursor: "pointer" }}
+              stackId="transicoes"
+              fill={cores[idx % cores.length]}
+              cursor="pointer"
             />
           ))}
-        </LineChart>
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );
