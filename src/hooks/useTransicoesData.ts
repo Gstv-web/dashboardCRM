@@ -84,14 +84,11 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
   useEffect(() => {
     if (!boardId) {
-      console.log("[useTransicoesData] Sem boardId, abortando");
       return;
     }
-    console.log("[useTransicoesData] Iniciando busca com boardId:", boardId);
     let cancelado = false;
 
     async function carregar() {
-      console.log("[useTransicoesData] Função carregar() iniciada");
       setIsLoading(true);
       setError(null);
 
@@ -105,7 +102,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       let debugCount = 0; // limita logs brutos
 
       while (true) {
-        console.log("[useTransicoesData] Buscando página", page);
         const from = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
         const to = new Date().toISOString();
         
@@ -145,14 +141,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
         const logs: ActivityLog[] = response?.data?.boards?.[0]?.activity_logs ?? [];
         // console.log("[useTransicoesData] Página", page, 'retornou', logs.length, 'logs');
         for (const log of logs) {
-          if (debugCount < 20) {
-            console.log("[useTransicoesData][RAW] log:", {
-              event: log.event,
-              data: log.data,
-              created_at: log.created_at,
-            });
-          }
-
           const data = tryParseJSON<any>(log.data) ?? {};
           const colunaId = data.columnId || data.column_id || data.column_id;
           if (colunaId && colunaId !== STATUS_COLUMN_ID) {
@@ -196,12 +184,9 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           });
           
           if (!transicaoEsperada) {
-            console.log("[useTransicoesData] Log descartado: transição NÃO está em TRANSICOES_INTERESSE", { de, para });
             debugCount++;
             continue;
           }
-          
-          console.log("[useTransicoesData] Log ACEITO - Transição válida:", { de, para });
 
           // Extrai itemId - em activity_logs é "pulse_id"
           const itemId = String(
@@ -213,7 +198,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           );
           
           if (!itemId) {
-            console.log("[useTransicoesData] ⚠️ Log descartado: sem itemId. Data keys:", Object.keys(data));
             debugCount++;
             continue;
           }
@@ -229,7 +213,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
           
           const itemInfo = itemMap.get(itemId);
 
-          console.log("[useTransicoesData] ✅ Log ACEITO E ADICIONADO:", { de, para, itemId, itemName });
           acumulado.push({
             logId: String(log.id),
             itemId,
@@ -253,7 +236,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       }
 
       if (!cancelado) {
-        console.log("LOGS FINAIS - Total de transições encontradas:", acumulado.length, acumulado);
         setRegistros(acumulado);
         setIsLoading(false);
       }
@@ -265,7 +247,6 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
       cancelado = true;
     };
   }, [boardId, itemMap]);
-  console.log("Registros de transições (useTransicoesData):", registros);
 
   return { registros, isLoading, error };
 }

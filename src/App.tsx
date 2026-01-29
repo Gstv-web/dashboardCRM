@@ -56,23 +56,17 @@ function App() {
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
   const dadosTransicoes = useMemo(() => {
-    console.log("[dadosTransicoes] Iniciando processamento...");
-    console.log("[dadosTransicoes] transicoesRegistros recebidos:", transicoesRegistros);
-    
     const limiteMs = Date.now() - periodoTransicoes * 24 * 60 * 60 * 1000;
-    console.log("[dadosTransicoes] Limite de ms:", limiteMs);
 
     const filtradosPorData = transicoesRegistros.filter((t) => {
       const tMs = new Date(t.createdAt).getTime();
       if (Number.isNaN(tMs)) return false;
       return tMs >= limiteMs;
     });
-    console.log("[dadosTransicoes] Após filtro por data:", filtradosPorData.length, "registros");
 
     const filtradosPorVendedor = vendedorGrafico
       ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
       : filtradosPorData;
-    console.log("[dadosTransicoes] Após filtro por vendedor:", filtradosPorVendedor.length, "registros");
 
     const mapa: Record<string, { data: string; transicao: string; total: number; items: any[] }> = {};
 
@@ -92,14 +86,12 @@ function App() {
         fechamento_vendas: t.fechamento_vendas,
         valor_contrato: t.valor_contrato,
         etapa: t.para,
-        transicao: transicao, // Adiciona a transição completa
+        transicao: transicao,
         vendedor: t.vendedor,
         performance: t.performance,
         data_transicao: t.createdAt,
       });
     });
-
-    console.log("[dadosTransicoes] Mapa agregado:", Object.keys(mapa).length, "transições únicas");
 
     const resultado = Object.values(mapa).sort((a, b) => {
       const dataDiff = new Date(b.data).getTime() - new Date(a.data).getTime();
@@ -107,7 +99,6 @@ function App() {
       return b.total - a.total;
     });
     
-    console.log("[dadosTransicoes] Resultado final:", resultado);
     return resultado;
   }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
   
@@ -358,10 +349,8 @@ function App() {
                     onPontoClick={(p) => {
                       // const itensDoDia = p.payload.items || [];
                       // console.log("itens do dia clicado:", itensDoDia);
-                      console.log("Ponto clicado (App.tsx):", p);
                       setFiltroEtapa("");
                       setPontoSelecionado(p);
-                      console.log("Ponto selecionado (useState):", pontoSelecionado);
                       // setPontoSelecionado({
                       //   dia: p.dia,
                       //   items: [...itensDoDia].sort((a, b) => a.etapa.localeCompare(b.etapa))
@@ -480,7 +469,6 @@ function App() {
                           periodo: p.periodo,
                           items: p.items,
                         });
-                        console.log("ponto clickado", p);
                       }}
                     />
                   )}

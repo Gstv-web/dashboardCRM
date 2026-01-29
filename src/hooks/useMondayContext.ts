@@ -25,7 +25,6 @@ export function useMondayContext() {
 
         setBoardId(id);
         setTheme(currentTheme);
-        console.log("Contexto Monday:", { id, theme: currentTheme });
       } catch (err) {
         console.error("Erro ao obter contexto do Monday:", err);
         setBoardId(3591217049);
