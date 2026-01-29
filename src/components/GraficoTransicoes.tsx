@@ -34,7 +34,26 @@ export default function GraficoTransicoes({ dados }: GraficoTransicoesProps) {
     (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
   );
 
-  const transicoesArray = Array.from(transicoesUnicas);
+  // Ordem específica para as transições
+  const ordemTransicoes = [
+    "Prospect - 25% → Oportunidade - 50%",
+    "Oportunidade - 50% → Forecast - 75%",
+    "Forecast - 75% → Forecast - 90%",
+  ];
+
+  const transicoesArray = Array.from(transicoesUnicas).sort((a, b) => {
+    const indexA = ordemTransicoes.indexOf(a);
+    const indexB = ordemTransicoes.indexOf(b);
+
+    // Se ambas estão na lista de prioridade, ordena pela posição
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+    // Se só A está na lista, A vem primeiro
+    if (indexA !== -1) return -1;
+    // Se só B está na lista, B vem primeiro
+    if (indexB !== -1) return 1;
+    // Se nenhuma está na lista, mantém ordem alfabética
+    return a.localeCompare(b);
+  });
 
   const cores = [
     "#2563eb",
