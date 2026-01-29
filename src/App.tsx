@@ -479,6 +479,7 @@ function App() {
                           periodo: p.periodo,
                           items: p.items,
                         });
+                        console.log("ponto clickado", p);
                       }}
                     />
                   )}
