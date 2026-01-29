@@ -92,6 +92,7 @@ function App() {
         fechamento_vendas: t.fechamento_vendas,
         valor_contrato: t.valor_contrato,
         etapa: t.para,
+        transicao: transicao, // Adiciona a transição completa
         vendedor: t.vendedor,
         performance: t.performance,
         data_transicao: t.createdAt,
@@ -512,9 +513,9 @@ function App() {
                           <tr className="border-b bg-gray-100">
                             <th className="p-2 text-left">Nome</th>
                             <th className="p-2 text-left">Data da transição</th>
+                            <th className="p-2 text-left">Transição</th>
                             <th className="p-2 text-left">Fechamento</th>
                             <th className="p-2 text-left">Valor</th>
-                            <th className="p-2 text-left">Etapa</th>
                             <th className="p-2 text-left">Vendedor</th>
                             <th className="p-2 text-left">Performance</th>
                           </tr>
@@ -526,13 +527,13 @@ function App() {
                               <td className="p-2">
                                 {formatarData(item?.data_transicao)}
                               </td>
+                              <td className="p-2">{item.transicao}</td>
                               <td className="p-2">
                                 {formatarData(item?.fechamento_vendas)}
                               </td>
                               <td className="p-2">
                                 {formatarDinheiro(item.valor_contrato)}
                               </td>
-                              <td className="p-2">{item.etapa}</td>
                               <td className="p-2">{item.vendedor}</td>
                               <td className="p-2">{item.performance}</td>
                             </tr>
