@@ -68,39 +68,54 @@ function App() {
       ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
       : filtradosPorData;
 
-    const mapa: Record<string, { data: string; transicao: string; movimento: string; total: number; items: any[] }> = {};
+    // 🎯 AGRUPA POR DATA (unificado)
+    const mapaData: Record<string, { 
+      data: string; 
+      transicoes: Array<{ transicao: string; movimento: string; total: number; items: any[] }>; 
+      totalGeral: number; 
+      items: any[] 
+    }> = {};
 
     filtradosPorVendedor.forEach((t) => {
       const dataIso = new Date(t.createdAt).toISOString().slice(0, 10);
       const transicao = `${t.de} → ${t.para}`;
-      const chave = `${dataIso}|${transicao}`;
 
-      if (!mapa[chave]) {
-        mapa[chave] = { data: dataIso, transicao, movimento: t.movimento, total: 0, items: [] };
+      if (!mapaData[dataIso]) {
+        mapaData[dataIso] = { data: dataIso, transicoes: [], totalGeral: 0, items: [] };
       }
 
-      mapa[chave].total += 1;
-      mapa[chave].items.push({
+      // Procura ou cria transição
+      let transicaoObj = mapaData[dataIso].transicoes.find(tr => tr.transicao === transicao);
+      if (!transicaoObj) {
+        transicaoObj = { transicao, movimento: t.movimento, total: 0, items: [] };
+        mapaData[dataIso].transicoes.push(transicaoObj);
+      }
+
+      transicaoObj.total += 1;
+      mapaData[dataIso].totalGeral += 1;
+
+      const itemObj = {
         id: t.itemId,
         name: t.itemName,
         fechamento_vendas: t.fechamento_vendas,
         valor_contrato: t.valor_contrato,
         etapa: t.para,
         transicao: transicao,
-        movimento: t.movimento, // ✅ ADICIONADO
+        movimento: t.movimento,
         vendedor: t.vendedor,
         performance: t.performance,
         data_transicao: t.createdAt,
-      });
+      };
+
+      transicaoObj.items.push(itemObj);
+      mapaData[dataIso].items.push(itemObj);
     });
 
-    const resultado = Object.values(mapa).sort((a, b) => {
-      const dataDiff = new Date(b.data).getTime() - new Date(a.data).getTime();
-      if (dataDiff !== 0) return dataDiff;
-      return b.total - a.total;
+    const resultado = Object.values(mapaData).sort((a, b) => {
+      return new Date(b.data).getTime() - new Date(a.data).getTime();
     });
     
-    console.log("📈 [App.tsx] dadosTransicoes processados:", resultado);
+    console.log("📈 [App.tsx] dadosTransicoes unificados por data:", resultado);
     console.log("🔍 Filtros aplicados:", { periodo: periodoTransicoes + " dias", vendedor: vendedorGrafico || "Todos" });
     
     return resultado;

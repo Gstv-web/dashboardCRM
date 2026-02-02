@@ -10,7 +10,12 @@ import {
 } from "recharts";
 
 interface GraficoTransicoesProps {
-  dados: Array<{ data: string; transicao: string; movimento: string; total: number; items?: any[] }>;
+  dados: Array<{ 
+    data: string; 
+    transicoes: Array<{ transicao: string; movimento: string; total: number; items?: any[] }>; 
+    totalGeral: number; 
+    items?: any[] 
+  }>;
   onPontoClick?: (ponto: any) => void;
 }
 
@@ -18,30 +23,31 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
-  // Agrupa dados por data, criando uma propriedade para cada transição
-  const mapaDataTransicoes: Record<string, any> = {};
-  const mapaDataItems: Record<string, any[]> = {}; // Armazena items por data
-  const transicoesUnicas = new Set<string>();
-  const tipoMovimentoPorTransicao: Record<string, string> = {}; // AVANCOU ou REGREDIU
-
-  dados.forEach(({ data, transicao, movimento, total, items }) => {
-    if (!mapaDataTransicoes[data]) {
-      mapaDataTransicoes[data] = { data };
-      mapaDataItems[data] = [];
-    }
-    mapaDataTransicoes[data][transicao] = total;
-    transicoesUnicas.add(transicao);
-    tipoMovimentoPorTransicao[transicao] = movimento;
+  // 🎯 Reformata para estrutura do Recharts (uma propriedade por transição)
+  const dadosFormatados = dados.map((dataObj) => {
+    const linha: any = { data: dataObj.data };
     
-    // Acumula todos os items daquela data
-    if (items) {
-      mapaDataItems[data].push(...items);
-    }
+    // Adiciona cada transição como propriedade
+    dataObj.transicoes.forEach((tr) => {
+      linha[tr.transicao] = tr.total;
+    });
+    
+    return linha;
   });
 
-  const dadosFormatados = Object.values(mapaDataTransicoes).sort(
-    (a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()
-  );
+  // Coleta todas as transições únicas e seu tipo de movimento
+  const transicoesUnicas = new Set<string>();
+  const tipoMovimentoPorTransicao: Record<string, string> = {};
+  const mapaDataItems: Record<string, any[]> = {};
+
+  dados.forEach((dataObj) => {
+    mapaDataItems[dataObj.data] = dataObj.items || [];
+    
+    dataObj.transicoes.forEach((tr) => {
+      transicoesUnicas.add(tr.transicao);
+      tipoMovimentoPorTransicao[tr.transicao] = tr.movimento;
+    });
+  });
 
   // Ordem específica para as transições
   const ordemTransicoes = [
