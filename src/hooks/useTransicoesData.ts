@@ -246,6 +246,12 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
       if (!cancelado) {
         setRegistros(acumulado);
+        console.log("🎯 [useTransicoesData] Registros carregados:", acumulado);
+        console.log("📊 Estatísticas:", {
+          total: acumulado.length,
+          avancos: acumulado.filter(r => r.movimento === "AVANCOU").length,
+          retrocessos: acumulado.filter(r => r.movimento === "REGREDIU").length,
+        });
         setIsLoading(false);
       }
     }

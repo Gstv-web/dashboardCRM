@@ -100,14 +100,11 @@ function App() {
       return b.total - a.total;
     });
     
+    console.log("📈 [App.tsx] dadosTransicoes processados:", resultado);
+    console.log("🔍 Filtros aplicados:", { periodo: periodoTransicoes + " dias", vendedor: vendedorGrafico || "Todos" });
+    
     return resultado;
   }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
-  
-  // console.log("transicoesRegistros recebidos do hook:", transicoesRegistros);
-  // console.log("dadosTransicoes processados:", dadosTransicoes);
-  // console.log("isLoadingTransicoes:", isLoadingTransicoes);
-  // console.log("dados de useEvolucaoMesData em App.tsx:", dadosGraficoMes);
-  // console.log("dados de useEvolucaoData em App.tsx:", dadosGrafico);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
