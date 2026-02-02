@@ -55,6 +55,7 @@ function tryParseJSON<T>(value: any): T | null {
 
 // 🎯 Calcula se foi avanço ou regressão baseado no tier system
 function calcularMovimento(etapaDe: string, etapaPara: string): TipoMovimento {
+  if (etapaDe === "Definir") return "AVANCOU";
   const tierDe = ETAPA_TIERS[etapaDe];
   const tierPara = ETAPA_TIERS[etapaPara];
 
