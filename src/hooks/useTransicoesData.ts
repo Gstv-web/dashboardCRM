@@ -5,6 +5,21 @@ const monday = mondaySdk();
 
 const STATUS_COLUMN_ID = "status6__1"; // coluna de etapa
 
+// 🎯 TIER SYSTEM - Níveis de etapas (0-5)
+const ETAPA_TIERS: Record<string, number> = {
+  "Encerrado/Negado": 0,
+  "Stand-by": 0,
+  "Prospect - 25%": 1,
+  "Oportunidade - 50%": 2,
+  "Forecast - 75%": 3,
+  "Forecast - 90%": 4,
+  "Contrato Firmado - 100%": 5,
+  "Ação Pontual Firmada - 100%": 5,
+  "Operação Pró-Bono": 5,
+};
+
+export type TipoMovimento = "AVANCOU" | "REGREDIU";
+
 export interface TransicaoRegistro {
   logId: string;
   itemId: string;
@@ -17,6 +32,7 @@ export interface TransicaoRegistro {
   valor_contrato?: string | number | null;
   fechamento_vendas?: string | null;
   performance?: string | null;
+  movimento: TipoMovimento; // AVANCOU ou REGREDIU
 }
 
 interface ActivityLog {
@@ -26,15 +42,6 @@ interface ActivityLog {
   created_at?: string;
   entity?: { id?: string; name?: string } | null;
 }
-
-const TRANSICOES_INTERESSE: Array<{ de: string; para: string }> = [
-  { de: "Prospect - 25%", para: "Oportunidade - 50%" },
-  { de: "Oportunidade - 50%", para: "Forecast - 75%" },
-  { de: "Forecast - 75%", para: "Forecast - 90%" },
-  { de: "Forecast - 90%", para: "Contrato Firmado - 100%" },
-  { de: "Forecast - 90%", para: "Ação Pontual Firmada - 100%" },
-  { de: "Forecast - 90%", para: "Operação Pró-Bono" },
-];
 
 function tryParseJSON<T>(value: any): T | null {
   if (!value) return null;
@@ -46,9 +53,17 @@ function tryParseJSON<T>(value: any): T | null {
   }
 }
 
-function extrairLabel(obj: any): string | undefined {
-  if (!obj) return undefined;
-  return obj.label || obj.text || obj.title || obj.name;
+// 🎯 Calcula se foi avanço ou regressão baseado no tier system
+function calcularMovimento(etapaDe: string, etapaPara: string): TipoMovimento {
+  const tierDe = ETAPA_TIERS[etapaDe];
+  const tierPara = ETAPA_TIERS[etapaPara];
+
+  // Se não encontra tier em uma das etapas, considera como não classificado
+  if (tierDe === undefined || tierPara === undefined) {
+    return tierPara > tierDe ? "AVANCOU" : "REGREDIU";
+  }
+
+  return tierPara > tierDe ? "AVANCOU" : "REGREDIU";
 }
 
 function normalizarTexto(valor: string | undefined): string | undefined {
@@ -177,16 +192,9 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             debugCount++;
             continue;
           }
-          const transicaoEsperada = TRANSICOES_INTERESSE.find((t) => {
-            const tDe = normalizarTexto(t.de);
-            const tPara = normalizarTexto(t.para);
-            return tDe === de && tPara === para;
-          });
-          
-          if (!transicaoEsperada) {
-            debugCount++;
-            continue;
-          }
+
+          // 🎯 RASTREIA TODAS AS TRANSIÇÕES (removeu filtro TRANSICOES_INTERESSE)
+          const movimento = calcularMovimento(de, para);
 
           // Extrai itemId - em activity_logs é "pulse_id"
           const itemId = String(
@@ -225,6 +233,7 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
             valor_contrato: itemInfo?.valor_contrato ?? null,
             fechamento_vendas: itemInfo?.fechamento_vendas ?? null,
             performance: itemInfo?.performance ?? null,
+            movimento, // ✅ ADICIONADO: tipo de movimento (AVANCOU/REGREDIU)
           });
 
           debugCount++;

@@ -68,7 +68,7 @@ function App() {
       ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
       : filtradosPorData;
 
-    const mapa: Record<string, { data: string; transicao: string; total: number; items: any[] }> = {};
+    const mapa: Record<string, { data: string; transicao: string; movimento: string; total: number; items: any[] }> = {};
 
     filtradosPorVendedor.forEach((t) => {
       const dataIso = new Date(t.createdAt).toISOString().slice(0, 10);
@@ -76,7 +76,7 @@ function App() {
       const chave = `${dataIso}|${transicao}`;
 
       if (!mapa[chave]) {
-        mapa[chave] = { data: dataIso, transicao, total: 0, items: [] };
+        mapa[chave] = { data: dataIso, transicao, movimento: t.movimento, total: 0, items: [] };
       }
 
       mapa[chave].total += 1;
@@ -87,6 +87,7 @@ function App() {
         valor_contrato: t.valor_contrato,
         etapa: t.para,
         transicao: transicao,
+        movimento: t.movimento, // ✅ ADICIONADO
         vendedor: t.vendedor,
         performance: t.performance,
         data_transicao: t.createdAt,
@@ -502,6 +503,7 @@ function App() {
                             <th className="p-2 text-left">Nome</th>
                             <th className="p-2 text-left">Data da transição</th>
                             <th className="p-2 text-left">Transição</th>
+                            <th className="p-2 text-left">Movimento</th>
                             <th className="p-2 text-left">Fechamento</th>
                             <th className="p-2 text-left">Valor</th>
                             <th className="p-2 text-left">Vendedor</th>
@@ -516,6 +518,15 @@ function App() {
                                 {formatarData(item?.data_transicao)}
                               </td>
                               <td className="p-2">{item.transicao}</td>
+                              <td className="p-2">
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  item.movimento === "AVANCOU" 
+                                    ? "bg-green-100 text-green-800" 
+                                    : "bg-red-100 text-red-800"
+                                }`}>
+                                  {item.movimento === "AVANCOU" ? "✓ Avançou" : "✗ Regrediu"}
+                                </span>
+                              </td>
                               <td className="p-2">
                                 {formatarData(item?.fechamento_vendas)}
                               </td>

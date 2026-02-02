@@ -10,7 +10,7 @@ import {
 } from "recharts";
 
 interface GraficoTransicoesProps {
-  dados: Array<{ data: string; transicao: string; total: number; items?: any[] }>;
+  dados: Array<{ data: string; transicao: string; movimento: string; total: number; items?: any[] }>;
   onPontoClick?: (ponto: any) => void;
 }
 
@@ -22,14 +22,16 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
   const mapaDataTransicoes: Record<string, any> = {};
   const mapaDataItems: Record<string, any[]> = {}; // Armazena items por data
   const transicoesUnicas = new Set<string>();
+  const tipoMovimentoPorTransicao: Record<string, string> = {}; // AVANCOU ou REGREDIU
 
-  dados.forEach(({ data, transicao, total, items }) => {
+  dados.forEach(({ data, transicao, movimento, total, items }) => {
     if (!mapaDataTransicoes[data]) {
       mapaDataTransicoes[data] = { data };
       mapaDataItems[data] = [];
     }
     mapaDataTransicoes[data][transicao] = total;
     transicoesUnicas.add(transicao);
+    tipoMovimentoPorTransicao[transicao] = movimento;
     
     // Acumula todos os items daquela data
     if (items) {
@@ -62,17 +64,22 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
     return a.localeCompare(b);
   });
 
-  const cores = [
-    "#2563eb",
-    "#f8e800ff",
-    "#17d45c",
-    "#464e49ff",
-    "#135c25ff",
-    "#00a84cff",
-    "#dc2626",
-    "#da810cff",
-    "#64748b",
-  ];
+  // 🎨 CORES: Verde para Avanço, Vermelho para Regressão
+  const obterCorTransicao = (transicao: string): string => {
+    const movimento = tipoMovimentoPorTransicao[transicao];
+    
+    if (movimento === "AVANCOU") {
+      // Verdes para avanços
+      const verdes = ["#22c55e", "#16a34a", "#15803d", "#166534"];
+      return verdes[Object.keys(tipoMovimentoPorTransicao).filter(t => tipoMovimentoPorTransicao[t] === "AVANCOU").indexOf(transicao) % verdes.length];
+    } else if (movimento === "REGREDIU") {
+      // Vermelhos para retrocessos
+      const vermelhos = ["#ef4444", "#dc2626", "#b91c1c", "#7f1d1d"];
+      return vermelhos[Object.keys(tipoMovimentoPorTransicao).filter(t => tipoMovimentoPorTransicao[t] === "REGREDIU").indexOf(transicao) % vermelhos.length];
+    }
+    
+    return "#9ca3af"; // cinza padrão
+  };
 
   const formatarData = (dataIso: string) => {
     const d = new Date(dataIso);
@@ -111,12 +118,12 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
           />
           <Legend />
 
-          {transicoesArray.map((transicao, idx) => (
+          {transicoesArray.map((transicao) => (
             <Bar
               key={transicao}
               dataKey={transicao}
               stackId="transicoes"
-              fill={cores[idx % cores.length]}
+              fill={obterCorTransicao(transicao)}
               cursor="pointer"
               barSize={26}
             />
