@@ -512,7 +512,7 @@ function App() {
                           </tr>
                         </thead>
                         <tbody>
-                          {(pontoSelecionado.items || [])
+                          {[...(pontoSelecionado.items || [])]
                             .sort((a: any, b: any) => {
                               // 1️⃣ AVANCOU vem primeiro, REGREDIU depois
                               const movimentoA = a.movimento === "AVANCOU" ? 0 : 1;
