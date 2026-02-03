@@ -24,25 +24,27 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
 
   // 🎯 NOVA ESTRUTURA: Somar Avanços e Retrocessos por dia
-  const dadosAgregados = dados.map((dataObj) => {
-    let avancos = 0;
-    let retrocessos = 0;
+  const dadosAgregados = dados
+    .map((dataObj) => {
+      let avancos = 0;
+      let retrocessos = 0;
 
-    dataObj.transicoes.forEach((tr) => {
-      if (tr.movimento === "AVANCOU") {
-        avancos += tr.total;
-      } else if (tr.movimento === "REGREDIU") {
-        retrocessos += tr.total;
-      }
-    });
+      dataObj.transicoes.forEach((tr) => {
+        if (tr.movimento === "AVANCOU") {
+          avancos += tr.total;
+        } else if (tr.movimento === "REGREDIU") {
+          retrocessos += tr.total;
+        }
+      });
 
-    return {
-      data: dataObj.data,
-      "Avanços": avancos,
-      "Retrocessos": retrocessos,
-      items: dataObj.items || [],
-    };
-  });
+      return {
+        data: dataObj.data,
+        "Avanços": avancos,
+        "Retrocessos": retrocessos,
+        items: dataObj.items || [],
+      };
+    })
+    .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()); // ⬆️ Mais antigo → Mais novo
 
   // 🎨 CORES SIMPLES: Verde para Avanços, Vermelho para Retrocessos
   const cores = {
