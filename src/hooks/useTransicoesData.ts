@@ -18,7 +18,7 @@ const ETAPA_TIERS: Record<string, number> = {
   "Operação Pró-Bono": 5,
 };
 
-export type TipoMovimento = "AVANCOU" | "REGREDIU";
+export type TipoMovimento = "AVANCOU" | "REGREDIU" | "IGNORAR";
 
 export interface TransicaoRegistro {
   logId: string;
@@ -56,12 +56,18 @@ function tryParseJSON<T>(value: any): T | null {
 // 🎯 Calcula se foi avanço ou regressão baseado no tier system
 function calcularMovimento(etapaDe: string, etapaPara: string): TipoMovimento {
   if (etapaDe === "Definir") return "AVANCOU";
+  
   const tierDe = ETAPA_TIERS[etapaDe];
   const tierPara = ETAPA_TIERS[etapaPara];
 
   // Se não encontra tier em uma das etapas, considera como não classificado
   if (tierDe === undefined || tierPara === undefined) {
     return tierPara > tierDe ? "AVANCOU" : "REGREDIU";
+  }
+
+  // 🚫 IGNORAR: Tier 5 caindo para Tier 0 (Contrato/Ação Pontual → Encerrado/Stand-by)
+  if (tierDe === 5 && tierPara === 0) {
+    return "IGNORAR";
   }
 
   return tierPara > tierDe ? "AVANCOU" : "REGREDIU";
@@ -196,6 +202,12 @@ export function useTransicoesData(boardId: number | null, items: any[]) {
 
           // 🎯 RASTREIA TODAS AS TRANSIÇÕES (removeu filtro TRANSICOES_INTERESSE)
           const movimento = calcularMovimento(de, para);
+
+          // 🚫 IGNORA transições de tier 5 para tier 0
+          if (movimento === "IGNORAR") {
+            debugCount++;
+            continue;
+          }
 
           // Extrai itemId - em activity_logs é "pulse_id"
           const itemId = String(
