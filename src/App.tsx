@@ -493,20 +493,9 @@ function App() {
                       <h3 className="font-bold text-lg">
                         {pontoSelecionado.periodo}
                       </h3>
-
-                      <select
-                        className="etapa-filtro border p-2 rounded bg-white ml-auto"
-                        value={filtroEtapa}
-                        onChange={(e) => setFiltroEtapa(e.target.value)}
-                      >
-                        <option value="">Todas as etapas</option>
-                        {etapasUnicas.map((etapa) => (
-                          <option key={etapa}>{etapa}</option>
-                        ))}
-                      </select>
                     </div>
 
-                    {!itensFiltradosPorEtapa.length ? (
+                    {!pontoSelecionado.items?.length ? (
                       <p className="text-gray-500">Nenhum item nesta transição.</p>
                     ) : (
                       <table className="w-full border-collapse">
@@ -523,7 +512,20 @@ function App() {
                           </tr>
                         </thead>
                         <tbody>
-                          {itensFiltradosPorEtapa.map((item: any) => (
+                          {(pontoSelecionado.items || [])
+                            .sort((a: any, b: any) => {
+                              // 1️⃣ AVANCOU vem primeiro, REGREDIU depois
+                              const movimentoA = a.movimento === "AVANCOU" ? 0 : 1;
+                              const movimentoB = b.movimento === "AVANCOU" ? 0 : 1;
+                              
+                              if (movimentoA !== movimentoB) {
+                                return movimentoA - movimentoB;
+                              }
+                              
+                              // 2️⃣ Dentro do mesmo movimento, ordena por transição alfabética
+                              return (a.transicao || "").localeCompare(b.transicao || "");
+                            })
+                            .map((item: any) => (
                             <tr key={item.id} className="border-b">
                               <td className="p-2">{item.name}</td>
                               <td className="p-2">
