@@ -19,6 +19,7 @@ function App() {
 
   const [vendedorVisaoGeral, setVendedorVisaoGeral] = useState<string>();
   const [vendedorGrafico, setVendedorGrafico] = useState<string>();
+  const [empresaSelecionada, setEmpresaSelecionada] = useState<string>(); // ✅ ADICIONADO: Filtro empresa
   const [abaAtiva, setAbaAtiva] = useState<string>("Evolução Mês Atual");
   const [periodoTransicoes, setPeriodoTransicoes] = useState<number>(30);
 
@@ -44,14 +45,29 @@ function App() {
     new Set(items.map((i) => i.vendedor).filter(Boolean) as string[])
   ).sort();
 
+  // ✅ Extrair empresas únicas
+  const empresasUnicas: string[] = Array.from(
+    new Set(items.map((i) => i.empresa).filter(Boolean) as string[])
+  ).sort();
+
   const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
 
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
-    return vendedorGrafico
-      ? items.filter((i) => i.vendedor === vendedorGrafico)
-      : items;
-  }, [items, vendedorGrafico]);
+    let resultado = items;
+    
+    // Filtrar por vendedor se selecionado
+    if (vendedorGrafico) {
+      resultado = resultado.filter((i) => i.vendedor === vendedorGrafico);
+    }
+    
+    // Filtrar por empresa se selecionada
+    if (empresaSelecionada) {
+      resultado = resultado.filter((i) => i.empresa === empresaSelecionada);
+    }
+    
+    return resultado;
+  }, [items, vendedorGrafico, empresaSelecionada]);
 
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
@@ -68,6 +84,14 @@ function App() {
       ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
       : filtradosPorData;
 
+    // ✅ Filtrar por empresa também
+    const filtradosPorEmpresa = empresaSelecionada
+      ? filtradosPorVendedor.filter((t) => {
+          const itemInfo = items.find(i => i.id === t.itemId);
+          return itemInfo?.empresa === empresaSelecionada;
+        })
+      : filtradosPorVendedor;
+
     // 🎯 AGRUPA POR DATA (unificado)
     const mapaData: Record<string, { 
       data: string; 
@@ -76,7 +100,7 @@ function App() {
       items: any[] 
     }> = {};
 
-    filtradosPorVendedor.forEach((t) => {
+    filtradosPorEmpresa.forEach((t) => {
       const dataIso = new Date(t.createdAt).toISOString().slice(0, 10);
       const transicao = `${t.de} → ${t.para}`;
 
@@ -119,7 +143,7 @@ function App() {
     console.log("🔍 Filtros aplicados:", { periodo: periodoTransicoes + " dias", vendedor: vendedorGrafico || "Todos" });
     
     return resultado;
-  }, [transicoesRegistros, vendedorGrafico, periodoTransicoes]);
+  }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoTransicoes, items]);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
@@ -161,23 +185,41 @@ function App() {
       <div className="dashboard wrapper flex flex-col gap-10 w-300 justify-center m-4">
         {/* VISÃO GERAL */}
         <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
-          <div className="filtro flex justify-between items-center">
+          <div className="filtro flex justify-between items-center gap-4 flex-wrap">
             <h2 className="font-bold">Visão Geral</h2>
 
-            <div>
-              <span className="mr-3">Filtrar por vendedor:</span>
-              <select
-                className="border p-2 rounded bg-white"
-                value={vendedorVisaoGeral || ""}
-                onChange={(e) =>
-                  setVendedorVisaoGeral(e.target.value || undefined)
-                }
-              >
-                <option value="">Todos os vendedores</option>
-                {vendedoresUnicos.map((v) => (
-                  <option key={v}>{v}</option>
-                ))}
-              </select>
+            <div className="flex gap-4">
+              <div>
+                <span className="mr-3">Filtrar por vendedor:</span>
+                <select
+                  className="border p-2 rounded bg-white"
+                  value={vendedorVisaoGeral || ""}
+                  onChange={(e) =>
+                    setVendedorVisaoGeral(e.target.value || undefined)
+                  }
+                >
+                  <option value="">Todos os vendedores</option>
+                  {vendedoresUnicos.map((v) => (
+                    <option key={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <span className="mr-3">Filtrar por empresa:</span>
+                <select
+                  className="border p-2 rounded bg-white"
+                  value={empresaSelecionada || ""}
+                  onChange={(e) =>
+                    setEmpresaSelecionada(e.target.value || undefined)
+                  }
+                >
+                  <option value="">Todas as empresas</option>
+                  {empresasUnicas.map((emp) => (
+                    <option key={emp}>{emp}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -222,23 +264,41 @@ function App() {
             {/* ===================== EVOLUÇÃO 90 DIAS ======================= */}
             {abaAtiva === "Evolução 90 dias" && (
               <>
-                <div className="dashboard-filtro flex justify-between items-center p-4">
+                <div className="dashboard-filtro flex justify-between items-center p-4 gap-4 flex-wrap">
                   <h2 className="font-bold">Evolução por período</h2>
 
-                  <div>
-                    <span className="mr-3">Filtrar por vendedor:</span>
-                    <select
-                      className="border p-2 rounded bg-white"
-                      value={vendedorGrafico || ""}
-                      onChange={(e) =>
-                        setVendedorGrafico(e.target.value || undefined)
-                      }
-                    >
-                      <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v) => (
-                        <option key={v}>{v}</option>
-                      ))}
-                    </select>
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="mr-3">Filtrar por vendedor:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={vendedorGrafico || ""}
+                        onChange={(e) =>
+                          setVendedorGrafico(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todos os vendedores</option>
+                        {vendedoresUnicos.map((v) => (
+                          <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <span className="mr-3">Filtrar por empresa:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={empresaSelecionada || ""}
+                        onChange={(e) =>
+                          setEmpresaSelecionada(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todas as empresas</option>
+                        {empresasUnicas.map((emp) => (
+                          <option key={emp}>{emp}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -336,23 +396,41 @@ function App() {
             {/* ====================== MÊS ATUAL =========================== */}
             {abaAtiva === "Evolução Mês Atual" && (
               <>
-                <div className="dashboard-filtro flex justify-between items-center p-4">
+                <div className="dashboard-filtro flex justify-between items-center p-4 gap-4 flex-wrap">
                   <h2 className="font-bold">Evolução no mês atual</h2>
 
-                  <div>
-                    <span className="mr-3">Filtrar por etapa:</span>
-                    <select
-                      className="border p-2 rounded bg-white"
-                      value={vendedorGrafico || ""}
-                      onChange={(e) =>
-                        setVendedorGrafico(e.target.value || undefined)
-                      }
-                    >
-                      <option value="">Todos os vendedores</option>
-                      {vendedoresUnicos.map((v) => (
-                        <option key={v}>{v}</option>
-                      ))}
-                    </select>
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="mr-3">Filtrar por vendedor:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={vendedorGrafico || ""}
+                        onChange={(e) =>
+                          setVendedorGrafico(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todos os vendedores</option>
+                        {vendedoresUnicos.map((v) => (
+                          <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <span className="mr-3">Filtrar por empresa:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={empresaSelecionada || ""}
+                        onChange={(e) =>
+                          setEmpresaSelecionada(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todas as empresas</option>
+                        {empresasUnicas.map((emp) => (
+                          <option key={emp}>{emp}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -449,6 +527,22 @@ function App() {
                         <option value="">Todos os vendedores</option>
                         {vendedoresUnicos.map((v) => (
                           <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <span className="mr-2">Filtrar por empresa:</span>
+                      <select
+                        className="border p-2 rounded bg-white"
+                        value={empresaSelecionada || ""}
+                        onChange={(e) =>
+                          setEmpresaSelecionada(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todas as empresas</option>
+                        {empresasUnicas.map((emp) => (
+                          <option key={emp}>{emp}</option>
                         ))}
                       </select>
                     </div>

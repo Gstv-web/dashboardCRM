@@ -21,8 +21,8 @@ export function useMondayData(boardId: number | null) {
     // função recursiva de paginação
     function fetchPage(cursor?: string) {
       const query = cursor
-        ? `query { next_items_page(cursor: "${cursor}", limit: 500) { cursor items { id name column_values(ids: ["date_mkrbckxw", "status2", "status6__1", "dropdown_mksy1g2t", "pessoas1__1", "n_meros5", "formula_mkrcbxzb", "data7__1", "date2", "date", "date_mkyhg3p8", "data_mkm88e9q", "date_mkqz73j2", "date_mksxtcqj"]) { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
-        : `query { boards(ids: ${boardId}) { items_page(limit: 500) { cursor items { id name column_values(ids: ["date_mkrbckxw", "status2", "status6__1", "dropdown_mksy1g2t", "pessoas1__1", "n_meros5", "formula_mkrcbxzb", "data7__1", "date2", "date", "date_mkyhg3p8", "data_mkm88e9q", "date_mkqz73j2", "date_mksxtcqj"]) { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
+        ? `query { next_items_page(cursor: "${cursor}", limit: 500) { cursor items { id name column_values(ids: ["date_mkrbckxw", "status2", "status6__1", "dropdown_mksy1g2t", "pessoas1__1", "n_meros5", "formula_mkrcbxzb", "data7__1", "date2", "date", "date_mkyhg3p8", "data_mkm88e9q", "date_mkqz73j2", "date_mksxtcqj", "lista_suspensa2"]) { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } }`
+        : `query { boards(ids: ${boardId}) { items_page(limit: 500) { cursor items { id name column_values(ids: ["date_mkrbckxw", "status2", "status6__1", "dropdown_mksy1g2t", "pessoas1__1", "n_meros5", "formula_mkrcbxzb", "data7__1", "date2", "date", "date_mkyhg3p8", "data_mkm88e9q", "date_mkqz73j2", "date_mksxtcqj", "lista_suspensa2"]) { id text ... on MirrorValue { id display_value } ... on FormulaValue { id value display_value } ... on BoardRelationValue { linked_item_ids display_value } } } } } }`;
         // console.log("Executando query:", query);
       monday
         .api(query)
@@ -49,6 +49,7 @@ export function useMondayData(boardId: number | null) {
             status: getText(item, "status2"),
             etapa: getText(item, "status6__1"),
             vendedor: getText(item, "dropdown_mksy1g2t"),
+            empresa: getText(item, "lista_suspensa2"), // ✅ ADICIONADO: Empresa
             performance: getText(item, "pessoas1__1"),
             valor_contrato: getText(item, "n_meros5"),
             valor_mensal_contrato: getText(item, "formula_mkrcbxzb"),
