@@ -13,15 +13,29 @@ interface Item {
   vendedor?: string;
 }
 
-export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
+export function useEtapasData(
+  items: Item[],
+  vendedorSelecionado?: string,
+  empresaSelecionada?: string
+) {
   return useMemo(() => {
     if (!items.length) return [];
     // console.log("itens em useEtapasData:", items)
     // const itemsPorVendedor = vendedorSelecionado ? items.filter((item) => item.column_values.some((col) => col.id === "dropdown_mksy1g2t" && col.text === vendedorSelecionado)) : items;
    
-    const itemsFiltrados = vendedorSelecionado
-      ? items.filter((item) => item.status === "Ativo" && item.vendedor === vendedorSelecionado)
-      : items.filter((item) => item.status === "Ativo");
+    let itemsFiltrados = items.filter((item) => item.status === "Ativo");
+
+    if (vendedorSelecionado) {
+      itemsFiltrados = itemsFiltrados.filter(
+        (item) => item.vendedor === vendedorSelecionado
+      );
+    }
+
+    if (empresaSelecionada) {
+      itemsFiltrados = itemsFiltrados.filter(
+        (item: any) => item.empresa === empresaSelecionada
+      );
+    }
 
     // const itemsAtivos = items.filter((item) => item.status === "Ativo");
     // console.log("itens ativos:", itemsAtivos);
@@ -42,5 +56,5 @@ export function useEtapasData(items: Item[], vendedorSelecionado?: string) {
       const total = itemsFiltrados.filter((item) => item.etapa === title).length;
       return { title, total };
     });
-  }, [items, vendedorSelecionado]);
+  }, [items, vendedorSelecionado, empresaSelecionada]);
 }

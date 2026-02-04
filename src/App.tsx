@@ -50,7 +50,11 @@ function App() {
     new Set(items.map((i) => i.empresa).filter(Boolean) as string[])
   ).sort();
 
-  const visaoGeralFiltro = useEtapasData(items, vendedorVisaoGeral);
+  const visaoGeralFiltro = useEtapasData(
+    items,
+    vendedorVisaoGeral,
+    empresaSelecionada
+  );
 
   const itensFiltrados = useMemo(() => {
     if (!items) return [];
