@@ -192,7 +192,7 @@ function App() {
               <div>
                 <span className="mr-3">Filtrar por vendedor:</span>
                 <select
-                  className="border p-2 rounded bg-white"
+                  className="border px-2 py-1 rounded bg-white text-sm"
                   value={vendedorVisaoGeral || ""}
                   onChange={(e) =>
                     setVendedorVisaoGeral(e.target.value || undefined)
@@ -208,7 +208,7 @@ function App() {
               <div>
                 <span className="mr-3">Filtrar por empresa:</span>
                 <select
-                  className="border p-2 rounded bg-white"
+                  className="border px-2 py-1 rounded bg-white text-sm"
                   value={empresaSelecionada || ""}
                   onChange={(e) =>
                     setEmpresaSelecionada(e.target.value || undefined)
@@ -271,7 +271,7 @@ function App() {
                     <div>
                       <span className="mr-3">Filtrar por vendedor:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={vendedorGrafico || ""}
                         onChange={(e) =>
                           setVendedorGrafico(e.target.value || undefined)
@@ -287,7 +287,7 @@ function App() {
                     <div>
                       <span className="mr-3">Filtrar por empresa:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={empresaSelecionada || ""}
                         onChange={(e) =>
                           setEmpresaSelecionada(e.target.value || undefined)
@@ -403,7 +403,7 @@ function App() {
                     <div>
                       <span className="mr-3">Filtrar por vendedor:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={vendedorGrafico || ""}
                         onChange={(e) =>
                           setVendedorGrafico(e.target.value || undefined)
@@ -419,7 +419,7 @@ function App() {
                     <div>
                       <span className="mr-3">Filtrar por empresa:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={empresaSelecionada || ""}
                         onChange={(e) =>
                           setEmpresaSelecionada(e.target.value || undefined)
@@ -518,7 +518,7 @@ function App() {
                     <div>
                       <span className="mr-2">Filtrar por vendedor:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={vendedorGrafico || ""}
                         onChange={(e) =>
                           setVendedorGrafico(e.target.value || undefined)
@@ -534,7 +534,7 @@ function App() {
                     <div>
                       <span className="mr-2">Filtrar por empresa:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={empresaSelecionada || ""}
                         onChange={(e) =>
                           setEmpresaSelecionada(e.target.value || undefined)
@@ -550,7 +550,7 @@ function App() {
                     <div>
                       <span className="mr-2">Período:</span>
                       <select
-                        className="border p-2 rounded bg-white"
+                        className="border px-2 py-1 rounded bg-white text-sm"
                         value={periodoTransicoes}
                         onChange={(e) => setPeriodoTransicoes(Number(e.target.value))}
                       >
