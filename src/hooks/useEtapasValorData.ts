@@ -101,6 +101,9 @@ export function useEtapasValorData(
       return { title, total };
     });
 
+    const totalPrevisto = resultado.reduce((acc, etapa) => acc + etapa.total, 0);
+    resultado.push({ title: "Total previsto", total: totalPrevisto });
+
     console.log("📊 [useEtapasValorData] Totais por etapa:", resultado);
     console.log("🔍 Filtros aplicados:", {
       vendedor: vendedorSelecionado || "Todos",
