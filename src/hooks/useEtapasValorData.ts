@@ -25,10 +25,33 @@ const ETAPAS_VALOR = [
 function parseValorContrato(valor: string | number | null | undefined): number {
   if (typeof valor === "number") return valor;
   if (!valor) return 0;
-  const normalizado = String(valor)
-    .replace(/[^0-9,.-]/g, "")
-    .replace(/\./g, "")
-    .replace(/,/g, ".");
+  const texto = String(valor).trim();
+  const apenasNumeros = texto.replace(/[^0-9,.-]/g, "");
+
+  const temVirgula = apenasNumeros.includes(",");
+  const temPonto = apenasNumeros.includes(".");
+
+  let normalizado = apenasNumeros;
+
+  if (temVirgula && temPonto) {
+    // Formato 1.234.567,89 -> remove pontos e troca vírgula por ponto
+    normalizado = apenasNumeros.replace(/\./g, "").replace(/,/g, ".");
+  } else if (temVirgula && !temPonto) {
+    // Formato 1234567,89 -> troca vírgula por ponto
+    normalizado = apenasNumeros.replace(/,/g, ".");
+  } else if (temPonto && !temVirgula) {
+    // Formato 1234567.89 (decimal) ou 1.234.567 (milhar)
+    const partes = apenasNumeros.split(".");
+    const ultimaParte = partes[partes.length - 1];
+    if (ultimaParte.length === 3) {
+      // Assume separador de milhar
+      normalizado = apenasNumeros.replace(/\./g, "");
+    } else {
+      // Assume decimal
+      normalizado = apenasNumeros;
+    }
+  }
+
   const n = Number(normalizado);
   return Number.isFinite(n) ? n : 0;
 }
