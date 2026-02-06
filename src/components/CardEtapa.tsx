@@ -3,7 +3,7 @@ import React from "react";
 // em typescript, preciso tipar as propriedades que o componente pode receber
 interface CardProps {
     title: string;
-    total: number;
+    total: number | string;
     titleColor?: string;
 }
 

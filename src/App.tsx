@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useEtapasData } from "./hooks/useEtapasData";
+import { useEtapasValorData } from "./hooks/useEtapasValorData";
 import { useMondayContext } from "./hooks/useMondayContext";
 import { useMondayData } from "./hooks/useMondayData";
 import { useEvolucaoData, PeriodoChave } from "./hooks/useEvolucaoData";
@@ -21,6 +22,7 @@ function App() {
   const [vendedorGrafico, setVendedorGrafico] = useState<string>();
   const [empresaSelecionada, setEmpresaSelecionada] = useState<string>(); // ✅ ADICIONADO: Filtro empresa
   const [abaAtiva, setAbaAtiva] = useState<string>("Evolução Mês Atual");
+  const [abaVisaoGeral, setAbaVisaoGeral] = useState<string>("Quantidade");
   const [periodoTransicoes, setPeriodoTransicoes] = useState<number>(30);
 
   // Estado do ponto selecionado
@@ -51,6 +53,11 @@ function App() {
   ).sort();
 
   const visaoGeralFiltro = useEtapasData(
+    items,
+    vendedorVisaoGeral,
+    empresaSelecionada
+  );
+  const visaoGeralValor = useEtapasValorData(
     items,
     vendedorVisaoGeral,
     empresaSelecionada
@@ -190,7 +197,24 @@ function App() {
         {/* VISÃO GERAL */}
         <div className="dashboard-visao-geral flex flex-col p-4 border-2 border-gray-300 border-opacity-25 rounded-2xl bg-white">
           <div className="filtro flex justify-between items-center gap-4 flex-wrap">
-            <h2 className="font-bold">Visão Geral</h2>
+            <div className="flex items-center gap-4">
+              <h2 className="font-bold">Visão Geral</h2>
+              <div className="flex border rounded-lg overflow-hidden">
+                {["Quantidade", "Valor"].map((aba) => (
+                  <button
+                    key={aba}
+                    onClick={() => setAbaVisaoGeral(aba)}
+                    className={`px-3 py-1 text-sm font-medium ${
+                      abaVisaoGeral === aba
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-gray-600"
+                    }`}
+                  >
+                    {aba}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="flex gap-4">
               <div>
@@ -231,14 +255,19 @@ function App() {
             <p className="text-center text-gray-500">Carregando dados...</p>
           ) : (
             <div className="flex gap-20 justify-center flex-wrap m-4">
-              {visaoGeralFiltro.map((etapa, index) => (
-                <CardEtapa
-                  key={etapa.title}
-                  title={etapa.title}
-                  total={etapa.total}
-                  titleColor={cores[index % cores.length]}
-                />
-              ))}
+              {(abaVisaoGeral === "Quantidade" ? visaoGeralFiltro : visaoGeralValor)
+                .map((etapa, index) => (
+                  <CardEtapa
+                    key={etapa.title}
+                    title={etapa.title}
+                    total={
+                      abaVisaoGeral === "Quantidade"
+                        ? etapa.total
+                        : formatarDinheiro(etapa.total)
+                    }
+                    titleColor={cores[index % cores.length]}
+                  />
+                ))}
             </div>
           )}
         </div>
