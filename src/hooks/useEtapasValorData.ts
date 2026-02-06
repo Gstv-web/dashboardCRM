@@ -56,9 +56,25 @@ export function useEtapasValorData(
     }
 
     const resultado = ETAPAS_VALOR.map((title) => {
-      const total = itemsFiltrados
-        .filter((item) => item.etapa === title)
-        .reduce((acc, item) => acc + parseValorContrato(item.valor_contrato), 0);
+      const itensEtapa = itemsFiltrados.filter((item) => item.etapa === title);
+      const total = itensEtapa.reduce(
+        (acc, item) => acc + parseValorContrato(item.valor_contrato),
+        0
+      );
+
+      if (title === "Prospect - 25%") {
+        console.log("🧾 [useEtapasValorData] Prospect detalhes:", {
+          quantidade: itensEtapa.length,
+          itens: itensEtapa.map((item) => ({
+            id: item.id,
+            name: item.name,
+            valor_bruto: item.valor_contrato,
+            valor_parseado: parseValorContrato(item.valor_contrato),
+          })),
+          total,
+        });
+      }
+
       return { title, total };
     });
 
