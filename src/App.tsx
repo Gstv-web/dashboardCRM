@@ -200,7 +200,7 @@ function App() {
             <div className="flex items-center gap-4">
               <h2 className="font-bold">Visão Geral</h2>
               <div className="flex border rounded-lg overflow-hidden">
-                {["Quantidade", "Valor"].map((aba) => (
+                {["Quantidade", "Valor de contrato"].map((aba) => (
                   <button
                     key={aba}
                     onClick={() => setAbaVisaoGeral(aba)}

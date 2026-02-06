@@ -55,11 +55,20 @@ export function useEtapasValorData(
       );
     }
 
-    return ETAPAS_VALOR.map((title) => {
+    const resultado = ETAPAS_VALOR.map((title) => {
       const total = itemsFiltrados
         .filter((item) => item.etapa === title)
         .reduce((acc, item) => acc + parseValorContrato(item.valor_contrato), 0);
       return { title, total };
     });
+
+    console.log("📊 [useEtapasValorData] Totais por etapa:", resultado);
+    console.log("🔍 Filtros aplicados:", {
+      vendedor: vendedorSelecionado || "Todos",
+      empresa: empresaSelecionada || "Todas",
+      totalItemsAtivos: itemsFiltrados.length,
+    });
+
+    return resultado;
   }, [items, vendedorSelecionado, empresaSelecionada]);
 }
