@@ -23,7 +23,12 @@ function App() {
   const [empresaSelecionada, setEmpresaSelecionada] = useState<string>(); // ✅ ADICIONADO: Filtro empresa
   const [abaAtiva, setAbaAtiva] = useState<string>("Evolução Mês Atual");
   const [abaVisaoGeral, setAbaVisaoGeral] = useState<string>("Quantidade");
-  const [periodoTransicoes, setPeriodoTransicoes] = useState<number>(30);
+  const [periodoInicio, setPeriodoInicio] = useState<string>(
+    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+  );
+  const [periodoFim, setPeriodoFim] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
 
   // Estado do ponto selecionado
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
@@ -83,12 +88,15 @@ function App() {
   const dadosGrafico = useEvolucaoData(itensFiltrados);
   const dadosGraficoMes = useEvolucaoMesData(itensFiltrados);
   const dadosTransicoes = useMemo(() => {
-    const limiteMs = Date.now() - periodoTransicoes * 24 * 60 * 60 * 1000;
+    const inicioMs = periodoInicio ? new Date(periodoInicio + "T00:00:00Z").getTime() : null;
+    const fimMs = periodoFim ? new Date(periodoFim + "T23:59:59Z").getTime() : null;
 
     const filtradosPorData = transicoesRegistros.filter((t) => {
       const tMs = new Date(t.createdAt).getTime();
       if (Number.isNaN(tMs)) return false;
-      return tMs >= limiteMs;
+      if (inicioMs !== null && tMs < inicioMs) return false;
+      if (fimMs !== null && tMs > fimMs) return false;
+      return true;
     });
 
     const filtradosPorVendedor = vendedorGrafico
@@ -151,10 +159,15 @@ function App() {
     });
     
     console.log("📈 [App.tsx] dadosTransicoes unificados por data:", resultado);
-    console.log("🔍 Filtros aplicados:", { periodo: periodoTransicoes + " dias", vendedor: vendedorGrafico || "Todos" });
+    console.log("🔍 Filtros aplicados:", {
+      periodoInicio: periodoInicio || "(sem inicio)",
+      periodoFim: periodoFim || "(sem fim)",
+      vendedor: vendedorGrafico || "Todos",
+      empresa: empresaSelecionada || "Todas",
+    });
     
     return resultado;
-  }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoTransicoes, items]);
+  }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
@@ -580,19 +593,21 @@ function App() {
                       </select>
                     </div>
 
-                    <div>
+                    <div className="flex items-center gap-2">
                       <span className="mr-2">Período:</span>
-                      <select
+                      <input
+                        type="date"
                         className="border px-2 py-1 rounded bg-white text-sm"
-                        value={periodoTransicoes}
-                        onChange={(e) => setPeriodoTransicoes(Number(e.target.value))}
-                      >
-                        {[7, 14, 30, 60, 90].map((dias) => (
-                          <option key={dias} value={dias}>
-                            Últimos {dias} dias
-                          </option>
-                        ))}
-                      </select>
+                        value={periodoInicio}
+                        onChange={(e) => setPeriodoInicio(e.target.value)}
+                      />
+                      <span className="text-sm text-gray-500">a</span>
+                      <input
+                        type="date"
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={periodoFim}
+                        onChange={(e) => setPeriodoFim(e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
