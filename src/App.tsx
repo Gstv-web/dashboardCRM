@@ -620,9 +620,15 @@ function App() {
                       dados={dadosTransicoes}
                       onPontoClick={(p) => {
                         setFiltroEtapa("");
+
+                        const dataSelecionada = dadosTransicoes.find((d) => d.data === p.data);
+                        const itemsDoMovimento = (dataSelecionada?.transicoes ?? [])
+                          .filter((tr) => tr.movimento === p.movimento)
+                          .flatMap((tr) => tr.items ?? []);
+
                         setPontoSelecionado({
                           periodo: p.periodo,
-                          items: p.items,
+                          items: itemsDoMovimento,
                         });
                       }}
                     />

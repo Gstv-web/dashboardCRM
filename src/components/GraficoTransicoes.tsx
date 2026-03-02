@@ -16,12 +16,29 @@ interface GraficoTransicoesProps {
     totalGeral: number; 
     items?: any[] 
   }>;
-  onPontoClick?: (ponto: any) => void;
+  onPontoClick?: (ponto: { periodo: string; data: string; movimento: "AVANCOU" | "REGREDIU" }) => void;
 }
 
 export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransicoesProps) {
   if (!dados?.length)
     return <p className="text-gray-500 text-center">carregando gráfico...</p>;
+
+  const handleBarClick = (
+    movimento: "AVANCOU" | "REGREDIU",
+    barData: any
+  ) => {
+    if (!onPontoClick) return;
+
+    const payload = barData?.payload ?? barData;
+    const dataIso = payload?.data;
+    if (!dataIso) return;
+
+    onPontoClick({
+      periodo: formatarData(dataIso),
+      data: dataIso,
+      movimento,
+    });
+  };
 
   // 🎯 NOVA ESTRUTURA: Somar Avanços e Retrocessos por dia
   const dadosAgregados = dados
@@ -63,18 +80,6 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
         <BarChart
           data={dadosAgregados}
           margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
-          onClick={(e: any) => {
-            if (e && e.activeLabel && onPontoClick) {
-              const dataClicada = e.activeLabel;
-              const dataObj = dadosAgregados.find(d => d.data === dataClicada);
-              const items = dataObj?.items || [];
-              onPontoClick({
-                periodo: formatarData(dataClicada),
-                data: dataClicada,
-                items: items,
-              });
-            }
-          }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -96,6 +101,7 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
             fill={cores["Avanços"]}
             cursor="pointer"
             barSize={40}
+            onClick={(data) => handleBarClick("AVANCOU", data)}
           />
           <Bar
             dataKey="Retrocessos"
@@ -103,6 +109,7 @@ export default function GraficoTransicoes({ dados, onPontoClick }: GraficoTransi
             fill={cores["Retrocessos"]}
             cursor="pointer"
             barSize={40}
+            onClick={(data) => handleBarClick("REGREDIU", data)}
           />
         </BarChart>
       </ResponsiveContainer>
