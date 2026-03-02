@@ -208,12 +208,16 @@ function App() {
     });
 
     // Converte para array com médias
-    const resultado: MediaTransicaoTipo[] = Object.entries(mapaContagem).map(([tipo, contagem]) => ({
-      tipo,
-      contagem,
-      mediaPorDia: contagem / diasPeriodo,
-      diasEntreOcorrencias: diasPeriodo / Math.max(contagem, 1),
-    }));
+    const resultado: MediaTransicaoTipo[] = Object.entries(mapaContagem).map(([tipo, contagem]) => {
+      const mediaPorDia = contagem / diasPeriodo;
+      return {
+        tipo,
+        contagem,
+        mediaPorDia,
+        mediaPorMes: diasPeriodo > 30 ? mediaPorDia * 30 : undefined,
+        diasEntreOcorrencias: diasPeriodo / Math.max(contagem, 1),
+      };
+    });
 
     return { dados: resultado, diasPeriodo };
   }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
