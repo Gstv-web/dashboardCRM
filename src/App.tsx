@@ -214,7 +214,7 @@ function App() {
         tipo,
         contagem,
         mediaPorDia,
-        mediaPorMes: diasPeriodo > 30 ? mediaPorDia * 30 : undefined,
+        mediaPorMes: mediaPorDia * 30,
         diasEntreOcorrencias: diasPeriodo / Math.max(contagem, 1),
       };
     });

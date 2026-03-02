@@ -42,8 +42,6 @@ export default function GraficoMediaTransicoes({
     return valor.toFixed(2);
   };
 
-  const mostrarMediaMensal = diasPeriodo > 30;
-
   return (
     <div className="space-y-6">
       {/* Indicador de período */}
@@ -70,7 +68,7 @@ export default function GraficoMediaTransicoes({
               tick={{ fontSize: 11 }}
             />
             <YAxis 
-              label={{ value: mostrarMediaMensal ? 'Frequência' : 'Média por dia', angle: -90, position: 'insideLeft' }}
+              label={{ value: 'Frequência', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip
               formatter={(value: number) => formatarMedia(value)}
@@ -83,14 +81,12 @@ export default function GraficoMediaTransicoes({
               fill="#3b82f6"
               radius={[8, 8, 0, 0]}
             />
-            {mostrarMediaMensal && (
-              <Bar
-                dataKey="mediaPorMes"
-                name="Média/mês"
-                fill="#8b5cf6"
-                radius={[8, 8, 0, 0]}
-              />
-            )}
+            <Bar
+              dataKey="mediaPorMes"
+              name="Média/mês"
+              fill="#8b5cf6"
+              radius={[8, 8, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -103,9 +99,7 @@ export default function GraficoMediaTransicoes({
               <th className="p-3 text-left font-semibold">Tipo de Transição</th>
               <th className="p-3 text-center font-semibold">Contagem Total</th>
               <th className="p-3 text-center font-semibold">Média/dia</th>
-              {mostrarMediaMensal && (
-                <th className="p-3 text-center font-semibold">Média/mês</th>
-              )}
+              <th className="p-3 text-center font-semibold">Média/mês</th>
               <th className="p-3 text-center font-semibold">Dias entre ocorrências</th>
             </tr>
           </thead>
@@ -120,11 +114,9 @@ export default function GraficoMediaTransicoes({
                 <td className="p-3 text-center font-semibold text-blue-600">
                   {formatarMedia(item.mediaPorDia)}
                 </td>
-                {mostrarMediaMensal && (
-                  <td className="p-3 text-center font-semibold text-purple-600">
-                    {formatarMedia(item.mediaPorMes || 0)}
-                  </td>
-                )}
+                <td className="p-3 text-center font-semibold text-purple-600">
+                  {formatarMedia(item.mediaPorMes || 0)}
+                </td>
                 <td className="p-3 text-center text-gray-600">
                   {formatarMedia(item.diasEntreOcorrencias)}
                 </td>
@@ -137,9 +129,7 @@ export default function GraficoMediaTransicoes({
       {/* Legenda explicativa */}
       <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-600 space-y-2">
         <p><strong>Média/dia:</strong> Quantidade média de vezes que esta transição ocorre por dia no período</p>
-        {mostrarMediaMensal && (
-          <p><strong>Média/mês:</strong> Projeção mensal baseada na média diária (média/dia × 30)</p>
-        )}
+        <p><strong>Média/mês:</strong> Projeção mensal: quantas vezes espera-se que ocorra em 30 dias (média/dia × 30)</p>
         <p><strong>Dias entre ocorrências:</strong> Intervalo médio em dias entre cada ocorrência desta transição</p>
       </div>
     </div>
