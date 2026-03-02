@@ -10,6 +10,7 @@ import CardEtapa from "./components/CardEtapa";
 import GraficoEvolucao from "./components/GraficoEvolucao";
 import GraficoEvolucaoMes from "./components/GraficoEvolucaoMes";
 import GraficoTransicoes from "./components/GraficoTransicoes";
+import GraficoMediaTransicoes, { MediaTransicaoTipo } from "./components/GraficoMediaTransicoes";
 import "./App.css";
 
 function App() {
@@ -169,6 +170,54 @@ function App() {
     return resultado;
   }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
 
+  // 📊 Calcula média de transições por tipo
+  const dadosMediaTransicoes = useMemo(() => {
+    const inicioMs = periodoInicio ? new Date(periodoInicio + "T00:00:00Z").getTime() : null;
+    const fimMs = periodoFim ? new Date(periodoFim + "T23:59:59Z").getTime() : null;
+
+    // Calcula dias do período (inclusivo)
+    let diasPeriodo = 1;
+    if (inicioMs && fimMs) {
+      diasPeriodo = Math.max(1, Math.floor((fimMs - inicioMs) / (24 * 60 * 60 * 1000)) + 1);
+    }
+
+    const filtradosPorData = transicoesRegistros.filter((t) => {
+      const tMs = new Date(t.createdAt).getTime();
+      if (Number.isNaN(tMs)) return false;
+      if (inicioMs !== null && tMs < inicioMs) return false;
+      if (fimMs !== null && tMs > fimMs) return false;
+      return true;
+    });
+
+    const filtradosPorVendedor = vendedorGrafico
+      ? filtradosPorData.filter((t) => t.vendedor === vendedorGrafico)
+      : filtradosPorData;
+
+    const filtradosPorEmpresa = empresaSelecionada
+      ? filtradosPorVendedor.filter((t) => {
+          const itemInfo = items.find(i => i.id === t.itemId);
+          return itemInfo?.empresa === empresaSelecionada;
+        })
+      : filtradosPorVendedor;
+
+    // Agrupa por tipo de transição
+    const mapaContagem: Record<string, number> = {};
+    filtradosPorEmpresa.forEach((t) => {
+      const tipo = `${t.de} → ${t.para}`;
+      mapaContagem[tipo] = (mapaContagem[tipo] || 0) + 1;
+    });
+
+    // Converte para array com médias
+    const resultado: MediaTransicaoTipo[] = Object.entries(mapaContagem).map(([tipo, contagem]) => ({
+      tipo,
+      contagem,
+      mediaPorDia: contagem / diasPeriodo,
+      diasEntreOcorrencias: diasPeriodo / Math.max(contagem, 1),
+    }));
+
+    return { dados: resultado, diasPeriodo };
+  }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
+
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
     const d = new Date(iso);
@@ -288,7 +337,7 @@ function App() {
         {/* GRÁFICO COM ABAS */}
         <div className="dashboard-grafico-area border-2 border-opacity-25 border-gray-300 rounded-2xl">
           <div className="flex border-b border-gray-300">
-            {["Evolução Mês Atual", "Evolução 90 dias", "Transições"].map((aba) => (
+            {["Evolução Mês Atual", "Evolução 90 dias", "Transições", "Média de Transições"].map((aba) => (
               <button
                 key={aba}
                 onClick={() => {
@@ -704,6 +753,77 @@ function App() {
                     )}
                   </div>
                 )}
+              </>
+            )}
+
+            {/* ===================== MÉDIA DE TRANSIÇÕES ======================= */}
+            {abaAtiva === "Média de Transições" && (
+              <>
+                <div className="dashboard-filtro flex justify-between items-center p-4 gap-4 flex-wrap">
+                  <h2 className="font-bold">Média de Transições por Tipo</h2>
+
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div>
+                      <span className="mr-2">Filtrar por vendedor:</span>
+                      <select
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={vendedorGrafico || ""}
+                        onChange={(e) =>
+                          setVendedorGrafico(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todos os vendedores</option>
+                        {vendedoresUnicos.map((v) => (
+                          <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <span className="mr-2">Filtrar por empresa:</span>
+                      <select
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={empresaSelecionada || ""}
+                        onChange={(e) =>
+                          setEmpresaSelecionada(e.target.value || undefined)
+                        }
+                      >
+                        <option value="">Todas as empresas</option>
+                        {empresasUnicas.map((emp) => (
+                          <option key={emp}>{emp}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="mr-2">Período:</span>
+                      <input
+                        type="date"
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={periodoInicio}
+                        onChange={(e) => setPeriodoInicio(e.target.value)}
+                      />
+                      <span className="text-sm text-gray-500">a</span>
+                      <input
+                        type="date"
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={periodoFim}
+                        onChange={(e) => setPeriodoFim(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="dashboard-grafico m-2 p-2">
+                  {isLoadingTransicoes ? (
+                    <p className="text-center text-gray-500">Carregando dados...</p>
+                  ) : (
+                    <GraficoMediaTransicoes
+                      dados={dadosMediaTransicoes.dados}
+                      diasPeriodo={dadosMediaTransicoes.diasPeriodo}
+                    />
+                  )}
+                </div>
               </>
             )}
           </div>
