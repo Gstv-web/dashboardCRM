@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useEtapasData } from "./hooks/useEtapasData";
 import { useEtapasValorData } from "./hooks/useEtapasValorData";
 import { useMondayContext } from "./hooks/useMondayContext";
@@ -30,6 +30,7 @@ function App() {
   const [periodoFim, setPeriodoFim] = useState<string>(
     new Date().toISOString().slice(0, 10)
   );
+  const [transicaoSelecionada, setTransicaoSelecionada] = useState<string>("");
 
   // Estado do ponto selecionado
   const [pontoSelecionado, setPontoSelecionado] = useState<any | null>(null);
@@ -170,6 +171,34 @@ function App() {
     return resultado;
   }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
 
+  const transicoesUnicas = useMemo(() => {
+    const lista = dadosTransicoes.flatMap((d) =>
+      (d.transicoes ?? []).map((t) => t.transicao)
+    );
+    return Array.from(new Set(lista)).sort((a, b) => a.localeCompare(b));
+  }, [dadosTransicoes]);
+
+  const dadosTransicoesFiltrados = useMemo(() => {
+    if (!transicaoSelecionada) return dadosTransicoes;
+
+    return dadosTransicoes
+      .map((dia) => {
+        const transicoesFiltradas = (dia.transicoes ?? []).filter(
+          (t) => t.transicao === transicaoSelecionada
+        );
+        const itensFiltrados = transicoesFiltradas.flatMap((t) => t.items ?? []);
+        const totalGeral = transicoesFiltradas.reduce((acc, t) => acc + (t.total || 0), 0);
+
+        return {
+          ...dia,
+          transicoes: transicoesFiltradas,
+          totalGeral,
+          items: itensFiltrados,
+        };
+      })
+      .filter((dia) => dia.totalGeral > 0);
+  }, [dadosTransicoes, transicaoSelecionada]);
+
   // 📊 Calcula média de transições por tipo
   const dadosMediaTransicoes = useMemo(() => {
     const inicioMs = periodoInicio ? new Date(periodoInicio + "T00:00:00Z").getTime() : null;
@@ -221,6 +250,12 @@ function App() {
 
     return { dados: resultado, diasPeriodo };
   }, [transicoesRegistros, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, items]);
+
+  useEffect(() => {
+    if (abaAtiva === "Transições") {
+      setPontoSelecionado(null);
+    }
+  }, [abaAtiva, vendedorGrafico, empresaSelecionada, periodoInicio, periodoFim, transicaoSelecionada]);
 
   function formatarData(iso: string | Date | null | undefined) {
     if (!iso) return "";
@@ -662,6 +697,22 @@ function App() {
                         onChange={(e) => setPeriodoFim(e.target.value)}
                       />
                     </div>
+
+                    <div>
+                      <span className="mr-2">Filtrar por transição:</span>
+                      <select
+                        className="border px-2 py-1 rounded bg-white text-sm"
+                        value={transicaoSelecionada}
+                        onChange={(e) => setTransicaoSelecionada(e.target.value)}
+                      >
+                        <option value="">Todas as transições</option>
+                        {transicoesUnicas.map((transicao) => (
+                          <option key={transicao} value={transicao}>
+                            {transicao}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -670,18 +721,29 @@ function App() {
                     <p className="text-center text-gray-500">Carregando transições...</p>
                   ) : (
                     <GraficoTransicoes
-                      dados={dadosTransicoes}
+                      dados={dadosTransicoesFiltrados}
                       onPontoClick={(p) => {
                         setFiltroEtapa("");
 
-                        const dataSelecionada = dadosTransicoes.find((d) => d.data === p.data);
-                        const itemsDoMovimento = (dataSelecionada?.transicoes ?? [])
-                          .filter((tr) => tr.movimento === p.movimento)
-                          .flatMap((tr) => tr.items ?? []);
+                        const itensDoPeriodo = dadosTransicoesFiltrados
+                          .flatMap((d) => d.items ?? []);
+
+                        const inicioFormatado = formatarData(periodoInicio);
+                        const fimFormatado = formatarData(periodoFim);
+                        const tituloPeriodo = inicioFormatado && fimFormatado
+                          ? `${inicioFormatado} a ${fimFormatado}`
+                          : p.periodo;
+
+                        const somaTransicaoSelecionada = transicaoSelecionada
+                          ? itensDoPeriodo.filter((item: any) => item.transicao === transicaoSelecionada).length
+                          : null;
 
                         setPontoSelecionado({
-                          periodo: p.periodo,
-                          items: itemsDoMovimento,
+                          periodo: tituloPeriodo,
+                          movimentoSelecionado: p.movimento,
+                          transicaoSelecionada,
+                          somaTransicaoSelecionada,
+                          items: itensDoPeriodo,
                         });
                       }}
                     />
@@ -694,10 +756,17 @@ function App() {
                       <h3 className="font-bold text-lg">
                         {pontoSelecionado.periodo}
                       </h3>
+
+                      {pontoSelecionado.transicaoSelecionada && (
+                        <p className="text-sm text-gray-700">
+                          <strong>Transição:</strong> {pontoSelecionado.transicaoSelecionada} |{" "}
+                          <strong>Soma no período:</strong> {pontoSelecionado.somaTransicaoSelecionada ?? 0}
+                        </p>
+                      )}
                     </div>
 
                     {!pontoSelecionado.items?.length ? (
-                      <p className="text-gray-500">Nenhum item nesta transição.</p>
+                      <p className="text-gray-500">Nenhum item neste período.</p>
                     ) : (
                       <table className="w-full border-collapse">
                         <thead>
